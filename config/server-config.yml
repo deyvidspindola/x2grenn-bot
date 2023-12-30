@@ -1,0 +1,14 @@
+mongodb:
+  uri: ${MONGODB_URI}
+  database: ${MONGODB_DATABASE}
+  username: ${MONGODB_USERNAME}
+  password: ${MONGODB_PASSWORD}
+
+telegram:
+  token: ${TELEGRAM_TOKEN}
+  defaultChatId: ${TELEGRAM_CHAT_ID}
+
+bet:
+  url: ${BET_URL}
+  apiUrl: ${BET_API_URL}
+  apiKey: ${BET_API_KEY}
