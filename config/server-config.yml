@@ -1,5 +1,6 @@
 mongodb:
   uri: ${MONGODB_URI}
+  driver: ${MONGODB_DRIVER}
   database: ${MONGODB_DATABASE}
   username: ${MONGODB_USERNAME}
   password: ${MONGODB_PASSWORD}

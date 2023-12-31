@@ -1,22 +1,25 @@
 import { Inject } from 'typescript-ioc';
-import { SendMessage } from '../domain/send-message';
-import { Configurations } from '../infrastructure/configuration/configurations';
+
+import { MessageRepository } from '../domain/message-repository';
+import { ChatRepository } from '../domain/chat-repository';
 
 export class Bot {
   constructor(
     @Inject
-    private readonly sendMessage: SendMessage,
+    private readonly message: MessageRepository,
     @Inject
-    private readonly config: Configurations,
+    private readonly chat: ChatRepository,
   ) {}
 
   public async execute() {
     try {
-      await this.sendMessage.execute({
-        chatId: this.config.telegramDefaultChatId,
-        message: 'Hello World',
-      });
-      console.log('Executando bot');
+      const chats = await this.chat.chats();
+      for (const chat of chats) {
+        await this.message.sendMessage({
+          chatId: chat.chatId.toString(),
+          message: `Olá, ${chat.firstName}!`,
+        });
+      }
     } catch (error) {
       console.log(error);
     }

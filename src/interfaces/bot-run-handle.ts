@@ -6,7 +6,13 @@ export class BotRunHandle {
   constructor(@Inject private bot: Bot) {}
 
   public async run() {
-    schedule('*/10 * * * * *', () => {
+    schedule('*/3 * * * * *', () => {
+      this.bot.execute();
+    });
+  }
+
+  public async run2() {
+    schedule('*/5 * * * * *', () => {
       this.bot.execute();
     });
   }

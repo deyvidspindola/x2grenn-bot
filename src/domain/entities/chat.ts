@@ -1,10 +1,13 @@
 import { ChatStatus } from './enums/chat-status';
 
-export interface SaveChat {
+export interface Chat {
+  id?: string;
   firstName: string;
   lastName: string;
   chatId: number;
   createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date;
   status: ChatStatus;
 }
 

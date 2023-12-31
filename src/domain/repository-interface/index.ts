@@ -1,2 +1,3 @@
 export * from './repository-interface';
-export * from './telegram-interface';
+export * from './chat-interface';
+export * from './message-interface';

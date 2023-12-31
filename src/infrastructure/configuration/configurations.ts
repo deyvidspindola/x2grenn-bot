@@ -22,6 +22,10 @@ export class Configurations {
   /**
    * MONDODB
    */
+  public get mongoDbDriver(): string {
+    return this.getEnvVariable(this.config.mongodb.driver);
+  }
+
   public get mongoDbUri(): string {
     return this.getEnvVariable(this.config.mongodb.uri);
   }

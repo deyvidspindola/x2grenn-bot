@@ -1,4 +1,4 @@
-export interface SaveMessage {
+export interface Messages {
   chatId: number;
   gameId: number;
   eventId: number;

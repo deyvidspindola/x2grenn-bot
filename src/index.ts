@@ -7,14 +7,18 @@ import { BotRunHandle } from './interfaces/bot-run-handle';
 Container.configure(...config);
 Container.namespace(process.env.NODE_ENV || 'development');
 
-export const handler = async () => {
-  const mongoDb = Container.get(MongoDb);
-  const telegramClient = Container.get(TelegramClient);
-  const botRunHandle = Container.get(BotRunHandle);
+const mongoDb = Container.get(MongoDb);
+const telegramClient = Container.get(TelegramClient);
 
+export const handler = async () => {
   await mongoDb.connect();
   await telegramClient.start();
-  await botRunHandle.run();
+  await runBot();
 };
 
 handler();
+
+export const runBot = async () => {
+  const botRunHandle = Container.get(BotRunHandle);
+  await botRunHandle.run();
+};

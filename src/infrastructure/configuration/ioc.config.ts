@@ -1,11 +1,14 @@
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
-import { SendMessage } from '../../domain/send-message';
-import { TelegramSendMessage } from '../telegram/repositories/telegram-send-message';
+import { ChatRepository } from '../../domain/chat-repository';
+import { MongoChatRepository } from '../mongodb/repositories/mongo-chat-repository';
+import { MessageRepository } from '../../domain/message-repository';
+import { TelegramMessageRepository } from '../telegram/repositories/telegram-message-repository';
 
 const configDevFile = () => yaml.load(fs.readFileSync('config/server-config.yml', 'utf8'));
 
 export default [
   { bindName: 'config', to: configDevFile() },
-  { bind: SendMessage, to: TelegramSendMessage },
+  { bind: MessageRepository, to: TelegramMessageRepository },
+  { bind: ChatRepository, to: MongoChatRepository },
 ];
