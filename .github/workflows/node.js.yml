@@ -26,16 +26,16 @@ jobs:
 
       - name: Set Environment Variables
         run: |
-          echo "BET_URL=${{ secrets.BET_URL }}" >> .env
-          echo "BET_API_URL=${{ secrets.BET_API_URL }}" >> .env
-          echo "BET_API_KEY=${{ secrets.BET_API_KEY }}" >> .env
-          echo "MONGODB_DRIVER=${{ secrets.MONGODB_DRIVER }}" >> .env
-          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
-          echo "MONGODB_DATABASE=${{ secrets.MONGODB_DATABASE }}" >> .env
-          echo "MONGODB_USERNAME=${{ secrets.MONGODB_USERNAME }}" >> .env
-          echo "MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }}" >> .env
-          echo "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}" >> .env
-          echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> .env
+          echo "BET_URL=$secrets.BET_URL" >> .env
+          echo "BET_API_URL=$secrets.BET_API_URL" >> .env
+          echo "BET_API_KEY=$secrets.BET_API_KEY" >> .env
+          echo "MONGODB_DRIVER=$secrets.MONGODB_DRIVER" >> .env
+          echo "MONGODB_URI=$secrets.MONGODB_URI" >> .env
+          echo "MONGODB_DATABASE=$secrets.MONGODB_DATABASE" >> .env
+          echo "MONGODB_USERNAME=$secrets.MONGODB_USERNAME" >> .env
+          echo "MONGODB_PASSWORD=$secrets.MONGODB_PASSWORD" >> .env
+          echo "TELEGRAM_TOKEN=$secrets.TELEGRAM_TOKEN" >> .env
+          echo "TELEGRAM_CHAT_ID=$secrets.TELEGRAM_CHAT_ID" >> .env
 
       - name: Build
         run: npm run clean && tsc
