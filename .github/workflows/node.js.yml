@@ -25,7 +25,7 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm run clean && tsc && copyfiles -u 1 src/**/*.json dist
+        run: npm run clean && tsc
 
       - name: Commit Build to Branch
         run: |
