@@ -34,4 +34,4 @@ jobs:
           git checkout -b build-branch
           git add -f dist
           git commit -m "Add build artifacts"
-          git push origin build-branch
+          git push -f origin build-branch
