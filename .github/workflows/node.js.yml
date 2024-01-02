@@ -25,18 +25,19 @@ jobs:
         run: npm install
 
       - name: Make envfile
-        uses: ozaytsev86/create-env-file@v1
-        with:
-          INPUT_ENV_BET_URL: ${{ secrets.BET_URL }}
-          INPUT_ENV_BET_API_URL: ${{ secrets.BET_API_URL }}
-          INPUT_ENV_BET_API_KEY: ${{ secrets.BET_API_KEY }}
-          INPUT_ENV_MONGODB_DRIVER: ${{ secrets.MONGODB_DRIVER }}
-          INPUT_ENV_MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          INPUT_ENV_MONGODB_DATABASE: ${{ secrets.MONGODB_DATABASE }}
-          INPUT_ENV_MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
-          INPUT_ENV_MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
-          INPUT_ENV_TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          INPUT_ENV_TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          touch .env
+          echo BET_URL=${{ secrets.BET_URL }}
+          echo BET_API_URL=${{ secrets.BET_API_URL }}
+          echo BET_API_KEY=${{ secrets.BET_API_KEY }}
+          echo MONGODB_DRIVER=${{ secrets.MONGODB_DRIVER }}
+          echo MONGODB_URI=${{ secrets.MONGODB_URI }}
+          echo MONGODB_DATABASE=${{ secrets.MONGODB_DATABASE }}
+          echo MONGODB_USERNAME=${{ secrets.MONGODB_USERNAME }}
+          echo MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }}
+          echo TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}
+          echo TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}
+          cat .env
 
       - name: Build
         run: npm run clean && tsc
