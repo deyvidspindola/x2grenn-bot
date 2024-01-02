@@ -19,7 +19,7 @@ export const handler = async () => {
 handler();
 
 export const runBot = async () => {
-  //comentario
+  console.log('Bot is running');
   const botRunHandle = Container.get(BotRunHandle);
   await botRunHandle.run();
 };
