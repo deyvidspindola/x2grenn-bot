@@ -17,7 +17,7 @@ export class Bot {
       for (const chat of chats) {
         await this.message.sendMessage({
           chatId: chat.chatId.toString(),
-          message: `Olá, ${chat.firstName}!`,
+          message: `Hello, ${chat.firstName}!`,
         });
       }
     } catch (error) {
