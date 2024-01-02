@@ -35,6 +35,3 @@ jobs:
           git add -f dist
           git commit -m "Add build artifacts"
           git push origin build-branch
-
-      - name: Start Application
-        run: npm start  # Substitua isso pelo seu comando de inicial
