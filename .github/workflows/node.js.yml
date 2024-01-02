@@ -25,20 +25,18 @@ jobs:
         run: npm install
 
       - name: Make envfile
-        uses: SpicyPizza/create-envfile@v1
+        uses: ozaytsev86/create-env-file@v1
         with:
-          envkey_BET_URL: ${{ secrets.BET_URL }}
-          envkey_BET_API_URL: ${{ secrets.BET_API_URL }}
-          envkey_BET_API_KEY: ${{ secrets.BET_API_KEY }}
-          envkey_MONGODB_DRIVER: ${{ secrets.MONGODB_DRIVER }}
-          envkey_MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          envkey_MONGODB_DATABASE: ${{ secrets.MONGODB_DATABASE }}
-          envkey_MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
-          envkey_MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
-          envkey_TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          envkey_TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          fail_on_empty: false
-          sort_keys: false
+          INPUT_ENV_BET_URL: ${{ secrets.BET_URL }}
+          INPUT_ENV_BET_API_URL: ${{ secrets.BET_API_URL }}
+          INPUT_ENV_BET_API_KEY: ${{ secrets.BET_API_KEY }}
+          INPUT_ENV_MONGODB_DRIVER: ${{ secrets.MONGODB_DRIVER }}
+          INPUT_ENV_MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          INPUT_ENV_MONGODB_DATABASE: ${{ secrets.MONGODB_DATABASE }}
+          INPUT_ENV_MONGODB_USERNAME: ${{ secrets.MONGODB_USERNAME }}
+          INPUT_ENV_MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+          INPUT_ENV_TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          INPUT_ENV_TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
       - name: Build
         run: npm run clean && tsc
