@@ -1,9 +1,9 @@
 import { Inject } from 'typescript-ioc';
 
 import { MessageRepository } from '../domain/message-repository';
-import { ChatRepository } from '../domain/chat-repository';
+// import { ChatRepository } from '../domain/chat-repository';
 // import { RequestsRepository } from '../domain/requests-repository';
-// import { Configurations } from '../infrastructure/configuration/configurations';
+import { Configurations } from '../infrastructure/configuration/configurations';
 // import { Chat } from '../domain/entities/chat';
 
 // let send = [];
@@ -14,29 +14,29 @@ import { ChatRepository } from '../domain/chat-repository';
 // };
 export class BotDiffGolsUseCase {
   constructor(
-    // @Inject
-    // private readonly configuration: Configurations,
+    @Inject
+    private readonly configuration: Configurations,
     // @Inject
     // private readonly requests: RequestsRepository,
+    // @Inject
+    // private readonly chat: ChatRepository,
     @Inject
     private readonly message: MessageRepository,
-    @Inject
-    private readonly chat: ChatRepository,
   ) {}
 
   public async execute() {
     try {
-      const chats = await this.chat.chats();
-      if (!chats.length) {
-        return;
-      }
+      // const chats = await this.chat.chats();
+      // if (!chats.length) {
+      //   return;
+      // }
       // const bets = await this.requests.execute('Esoccer');
-      for (const chat of chats) {
-        await this.message.sendMessage({
-          chatId: chat.chatId.toString(),
-          message: `Hello, ${chat.firstName}!`,
-        });
-      }
+      // for (const chat of chats) {
+      await this.message.sendMessage({
+        chatId: this.configuration.telegramDefaultChatId,
+        message: `Hello, Deyvid!`,
+      });
+      // }
     } catch (error) {
       console.log(error);
     }
