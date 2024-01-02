@@ -17,7 +17,7 @@
     "lib": "dist"
   },
   "engines": {
-    "node": "~18.x"
+    "node": "~16.x"
   },
   "dependencies": {
     "@types/node": "^20.10.6",
