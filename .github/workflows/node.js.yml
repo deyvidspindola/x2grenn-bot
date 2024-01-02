@@ -25,7 +25,7 @@ jobs:
         run: npm install
 
       - name: Make envfile
-        uses: SpicyPizza/create-envfile@v2.0
+        uses: SpicyPizza/create-envfile@v1
         with:
           envkey_BET_URL: ${{ secrets.BET_URL }}
           envkey_BET_API_URL: ${{ secrets.BET_API_URL }}
