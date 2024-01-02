@@ -17,19 +17,7 @@
     "lib": "dist"
   },
   "engines": {
-    "node": "~16.x"
-  },
-  "dependencies": {
-    "@types/node": "^20.10.6",
-    "axios": "^1.6.3",
-    "dotenv": "^16.3.1",
-    "grammy": "^1.19.3",
-    "http-status-codes": "^2.3.0",
-    "js-yaml": "^4.1.0",
-    "mongodb": "^6.3.0",
-    "node-cron": "^3.0.3",
-    "node-fetch": "^3.3.2",
-    "typescript-ioc": "^3.2.2"
+    "node": "~16.14.2"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
@@ -40,5 +28,17 @@
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@types/node": "^20.10.6",
+    "axios": "^1.6.3",
+    "dotenv": "^16.3.1",
+    "grammy": "^1.20.2",
+    "http-status-codes": "^2.3.0",
+    "js-yaml": "^4.1.0",
+    "mongodb": "^6.3.0",
+    "node-cron": "^3.0.3",
+    "node-fetch": "^3.3.2",
+    "typescript-ioc": "^3.2.2"
   }
 }

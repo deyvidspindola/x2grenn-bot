@@ -1,7 +1,7 @@
 {
   "extends": [
-    "eslint:recommended",
-    "eslint-config-prettier"
+    "tslint:recommended",
+    "tslint-config-prettier"
   ],
   "rules": {
     "no-console": [
