@@ -46,8 +46,12 @@ export class Configurations {
    * TELEGRAM
    */
 
-  public get telegramToken(): string {
-    return this.getEnvVariable(this.config.telegram.token);
+  public get telegramBotDiffGolsToken(): string {
+    return this.getEnvVariable(this.config.telegram.bot.diffGols.token);
+  }
+
+  public get telegramBotConfigurationToken(): string {
+    return this.getEnvVariable(this.config.telegram.bot.configuration.token);
   }
 
   public get telegramDefaultChatId(): string {

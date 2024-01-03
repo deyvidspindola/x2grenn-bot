@@ -17,17 +17,7 @@
     "lib": "dist"
   },
   "engines": {
-    "node": "~16.14.2"
-  },
-  "devDependencies": {
-    "@types/js-yaml": "^4.0.9",
-    "@types/node-cron": "^3.0.11",
-    "copyfiles": "^2.4.1",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "rimraf": "^5.0.5",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "node": "~16.x"
   },
   "dependencies": {
     "@types/node": "^20.10.6",
@@ -40,5 +30,15 @@
     "node-cron": "^3.0.3",
     "node-fetch": "^3.3.2",
     "typescript-ioc": "^3.2.2"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node-cron": "^3.0.11",
+    "copyfiles": "^2.4.1",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }

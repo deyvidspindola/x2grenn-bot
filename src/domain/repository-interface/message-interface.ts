@@ -1,5 +1,6 @@
-import { sendMessage } from '../entities/message';
+import { Messages } from '../entities/message';
 
 export interface MessageInterface {
-  sendMessage(message: sendMessage): Promise<any>;
+  save(chat: Messages, database: string): Promise<any>;
+  messages(database: string): Promise<Messages[]>;
 }

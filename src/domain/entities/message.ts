@@ -1,4 +1,5 @@
 export interface Messages {
+  messageId: number;
   chatId: number;
   gameId: number;
   eventId: number;

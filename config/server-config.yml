@@ -6,7 +6,11 @@ mongodb:
   password: ${MONGODB_PASSWORD}
 
 telegram:
-  token: ${TELEGRAM_TOKEN}
+  bot:
+    diffGols:
+      token: ${TELEGRAM_BOT_DIFF_GOLS_TOKEN}
+    configuration:
+      token: ${TELEGRAM_BOT_CONFIGURATION_TOKEN}
   defaultChatId: ${TELEGRAM_CHAT_ID}
 
 bet:
