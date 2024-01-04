@@ -1,8 +1,9 @@
 import { Chat } from '../entities/chat';
 
 export interface ChatInterface {
-  save(chat: Chat, database: string): Promise<any>;
-  remove(chatId: number, database: string): Promise<any>;
-  chats(database: string): Promise<Chat[]>;
-  exists(chatId: number, database: string): Promise<boolean>;
+  init(database: string): Promise<any>;
+  save(chat: Chat): Promise<any>;
+  remove(chatId: number): Promise<any>;
+  chats(): Promise<Chat[]>;
+  exists(chatId: number): Promise<boolean>;
 }

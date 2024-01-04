@@ -2,8 +2,9 @@ import { Chat } from './entities/chat';
 import { ChatInterface } from './repository-interface/chat-interface';
 
 export abstract class ChatRepository implements ChatInterface {
-  abstract save(chat: Chat, database: string): Promise<any>;
-  abstract remove(chatId: number, database: string): Promise<any>;
-  abstract chats(database: string): Promise<Chat[]>;
-  abstract exists(chatId: number, database: string): Promise<boolean>;
+  abstract init(database: string): Promise<any>;
+  abstract save(chat: Chat): Promise<any>;
+  abstract remove(chatId: number): Promise<any>;
+  abstract chats(): Promise<Chat[]>;
+  abstract exists(chatId: number): Promise<boolean>;
 }

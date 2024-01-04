@@ -6,12 +6,12 @@ import { BotRunHandle } from './interfaces/bot-run-handle';
 Container.configure(...config);
 Container.namespace(process.env.NODE_ENV || 'development');
 
-const mongoDb = Container.get(MongoDb);
-
 export const handler = async () => {
-  await mongoDb.connect();
+  const mongoDb = Container.get(MongoDb);
   const botRunHandle = Container.get(BotRunHandle);
-  await botRunHandle.run();
+
+  await mongoDb.connect();
+  await botRunHandle.runBotDiffGols();
 };
 
 handler();

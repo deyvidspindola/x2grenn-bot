@@ -5,67 +5,58 @@ import { ChatStatus } from '../../../domain/entities/enums/chat-status';
 import { Chat } from '../../../domain/entities/chat';
 import { ChatRepository } from '../../../domain/chat-repository';
 import { Configurations } from '../../configuration/configurations';
-import { BotWinsRepository } from '../../../domain/bot-wins-repository';
+import { BotWinsRepository } from '../../../domain/bots/repository/bot-wins-repository';
 
 export const repositoryRegisterStoryFactory: ObjectFactory = () => {
   const config = Container.get(Configurations);
-  const telegramClient = new Bot(config.telegramBotConfigurationToken);
-  return new TelegramBotWinsRepository(telegramClient);
+  const telegramClient = new Bot(config.telegramBotWinsToken);
+  return new TelegramBotWinsRepository(telegramClient, config);
 };
 
 @Factory(repositoryRegisterStoryFactory)
-export class TelegramBotWinsRepository extends BotWinsRepository {
+export class TelegramBotWinsRepository implements BotWinsRepository {
   private chat: any;
-  constructor(@Inject private client: Bot) {
-    super();
+  constructor(
+    @Inject
+    private client: Bot,
+    @Inject
+    private config: Configurations,
+  ) {
     this.client;
+    this.config;
     this.chat = Container.get(ChatRepository);
+    this.chat.init(this.config.mongoDbWinsDatabase);
   }
+
   async start() {
     this.client.start();
     await this.subscribe();
     await this.unsubscribe();
-    await this.configDiffGols();
-    await this.pingpong();
-    console.log('Conectado ao Telegram');
+    console.log('Conectado ao BOT Diff Gols');
   }
 
   async sendMessage(message: sendMessage): Promise<any> {
-    await this.client.api.sendMessage(message.chatId, message.message, { parse_mode: 'HTML' });
-  }
-
-  async configDiffGols() {
-    this.client.on('message:text', async (ctx) => {
-      // Text is always defined because this handler is called when a text message is received.
-      const text: any = ctx;
-      console.log(text);
-    });
-  }
-
-  async pingpong() {
-    this.client.hears('ping', async (ctx) => {
-      // `reply` is an alias for `sendMessage` in the same chat (see next section).
-      await ctx.reply('pong', {
-        // `reply_parameters` specifies the actual reply feature.
-        reply_parameters: { message_id: ctx.msg.message_id },
-      });
+    return await this.client.api.sendMessage(message.chatId, message.message, {
+      parse_mode: 'HTML',
+      link_preview_options: { is_disabled: true },
+      protect_content: true,
     });
   }
 
   async subscribe() {
     this.client.command('start', async (ctx) => {
       const chatId = ctx.chat?.id;
-      ctx.react('😍');
+      const firstName = ctx.from?.first_name;
+      const lastName = ctx.from?.last_name;
+      const name = `<b>${firstName} ${lastName}</b>`;
       if (await this.chat.exists(chatId)) {
         this.sendMessage({
           chatId: chatId.toString(),
-          message: `Olá, <b>${ctx.from?.first_name}</b>! Você já está cadastrado no bot\nPara sair digite /sair`,
+          message: `Olá, ${name}! Você já está cadastrado!\nPara sair digite /sair`,
         });
         return;
       }
-      const firstName = ctx.from?.first_name;
-      const lastName = ctx.from?.last_name;
-      const message = `Olá ${firstName} ${lastName} seja bem vindo ao bot\nPara sair digite /sair`;
+      const message = `Olá ${name} seja bem vindo!\nPara sair digite /sair`;
       const data: Chat = {
         firstName,
         lastName,
@@ -82,16 +73,17 @@ export class TelegramBotWinsRepository extends BotWinsRepository {
   async unsubscribe() {
     this.client.command('sair', async (ctx) => {
       const chatId = ctx.chat?.id;
+      const firstName = ctx.from?.first_name;
+      const lastName = ctx.from?.last_name;
+      const name = `<b>${firstName} ${lastName}</b>`;
       if (!(await this.chat.exists(chatId))) {
         this.sendMessage({
           chatId: chatId.toString(),
-          message: `Olá, ${ctx.from?.first_name}! Você não está cadastrado no bot\nPara se cadastrar digite /start`,
+          message: `Olá, ${name}! Você não está cadastrado!\nPara se cadastrar digite /start`,
         });
         return;
       }
-      const firstName = ctx.from?.first_name;
-      const lastName = ctx.from?.last_name;
-      const message = `Olá ${firstName} ${lastName}, que pena que você está saindo do bot\nPara se cadastrar digite /start`;
+      const message = `Olá ${name}, que pena que você está saindo.\nPara se cadastrar digite /start`;
       this.chat.remove(chatId);
       this.sendMessage({ chatId: chatId.toString(), message });
     });

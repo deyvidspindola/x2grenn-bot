@@ -20,6 +20,13 @@ export class Configurations {
   }
 
   /**
+   * ENVIRONMENT
+   */
+  public get environment(): string {
+    return this.getEnvVariable(this.config.environment);
+  }
+
+  /**
    * MONDODB
    */
   public get mongoDbDriver(): string {
@@ -28,10 +35,6 @@ export class Configurations {
 
   public get mongoDbUri(): string {
     return this.getEnvVariable(this.config.mongodb.uri);
-  }
-
-  public get mongoDbDatabase(): string {
-    return this.getEnvVariable(this.config.mongodb.database);
   }
 
   public get mongoDbUsename(): string {
@@ -45,14 +48,6 @@ export class Configurations {
   /**
    * TELEGRAM
    */
-
-  public get telegramBotDiffGolsToken(): string {
-    return this.getEnvVariable(this.config.telegram.bot.diffGols.token);
-  }
-
-  public get telegramBotConfigurationToken(): string {
-    return this.getEnvVariable(this.config.telegram.bot.configuration.token);
-  }
 
   public get telegramDefaultChatId(): string {
     return this.getEnvVariable(this.config.telegram.defaultChatId);
@@ -70,8 +65,34 @@ export class Configurations {
     return this.getEnvVariable(this.config.bet.apiUrl);
   }
 
-  public get betApiKey(): string {
-    return this.getEnvVariable(this.config.bet.apiKey);
+  /**
+   * BOT DIFF GOLS
+   */
+  public get mongoDbDiffGolsDatabase(): string {
+    return this.getEnvVariable(this.config.mongodb.database.diffGols);
+  }
+
+  public get telegramBotDiffGolsToken(): string {
+    return this.getEnvVariable(this.config.telegram.bot.diffGols.token);
+  }
+
+  public get betBotDiffGolsApiKey(): string {
+    return this.getEnvVariable(this.config.bet.apiKey.diffGols);
+  }
+
+  /**
+   * BOT WINS
+   */
+  public get mongoDbWinsDatabase(): string {
+    return this.getEnvVariable(this.config.mongodb.database.wins);
+  }
+
+  public get telegramBotWinsToken(): string {
+    return this.getEnvVariable(this.config.telegram.bot.wins.token);
+  }
+
+  public get betBotWinsApiKey(): string {
+    return this.getEnvVariable(this.config.bet.apiKey.wins);
   }
 
   private getEnvVariable(value: any) {

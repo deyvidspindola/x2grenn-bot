@@ -1,19 +1,25 @@
+environment: ${ENVIRONMENT}
+
 mongodb:
   uri: ${MONGODB_URI}
   driver: ${MONGODB_DRIVER}
-  database: ${MONGODB_DATABASE}
   username: ${MONGODB_USERNAME}
   password: ${MONGODB_PASSWORD}
+  database: 
+    diffGols: ${MONGODB_BOT_DIFF_GOLS_DATABASE}
+    wins: ${MONGODB_BOT_WINS_DATABASE}
 
 telegram:
   bot:
     diffGols:
       token: ${TELEGRAM_BOT_DIFF_GOLS_TOKEN}
-    configuration:
-      token: ${TELEGRAM_BOT_CONFIGURATION_TOKEN}
+    wins:
+      token: ${TELEGRAM_BOT_WINS_TOKEN}
   defaultChatId: ${TELEGRAM_CHAT_ID}
 
 bet:
   url: ${BET_URL}
   apiUrl: ${BET_API_URL}
-  apiKey: ${BET_API_KEY}
+  apiKey: 
+    diffGols: ${BET_BOT_DIFF_GOLS_API_KEY}
+    wins: ${BET_BOT_WINS_API_KEY}

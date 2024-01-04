@@ -3,30 +3,34 @@ import { MongoDb } from '../mongodb';
 import { Messages } from '../../../domain/entities/message';
 import { MessageRepository } from '../../../domain/message-repository';
 
-export class MongoMessageRepository extends MessageRepository {
+export class MongoMessageRepository implements MessageRepository {
   constructor(
     @Inject
     private readonly mongoDb: MongoDb,
-  ) {
-    super();
+  ) {}
+
+  collectionName = 'messages';
+  client: any;
+  database: string;
+
+  async init(database: string) {
+    this.client = await this.mongoDb.getClient();
+    this.database = database;
   }
 
-  async save(message: Messages, database: string) {
-    const client = await this.mongoDb.getClient();
-    const collection = client.db(database).collection('messages');
+  async save(message: Messages) {
+    const collection = this.client.db(this.database).collection(this.collectionName);
     await collection.insertOne(message);
   }
 
-  async messages(database: string): Promise<Messages[]> {
-    const client = await this.mongoDb.getClient();
-    const collection = client.db(database).collection('messages');
+  async messages(): Promise<Messages[]> {
+    const collection = this.client.db(this.database).collection(this.collectionName);
     const documents = await collection.find().toArray();
-    return documents.map((doc) => doc as unknown as Messages);
+    return documents.map((doc: unknown) => doc as unknown as Messages);
   }
 
-  async removeMessages(database: string) {
-    const client = await this.mongoDb.getClient();
-    const collection = client.db(database).collection('messages');
+  async removeMessages() {
+    const collection = this.client.db(this.database).collection(this.collectionName);
     await collection.deleteMany({});
   }
 }

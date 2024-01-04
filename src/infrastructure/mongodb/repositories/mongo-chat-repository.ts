@@ -4,17 +4,23 @@ import { Chat } from '../../../domain/entities/chat';
 import { ChatRepository } from '../../../domain/chat-repository';
 import { ChatStatus } from '../../../domain/entities/enums/chat-status';
 
-export class MongoChatRepository extends ChatRepository {
+export class MongoChatRepository implements ChatRepository {
   constructor(
     @Inject
     private readonly mongoDb: MongoDb,
-  ) {
-    super();
+  ) {}
+
+  collectionName = 'chats';
+  client: any;
+  database: string;
+
+  async init(database: string) {
+    this.client = await this.mongoDb.getClient();
+    this.database = database;
   }
 
-  async save(chat: Chat, database: string) {
-    const client = await this.mongoDb.getClient();
-    const collection = client.db(database).collection('chatId');
+  async save(chat: Chat) {
+    const collection = this.client.db(this.database).collection(this.collectionName);
     const document = await collection.findOne({ chatId: chat.chatId });
     if (document) {
       await collection.updateOne(
@@ -31,9 +37,9 @@ export class MongoChatRepository extends ChatRepository {
     }
     await collection.insertOne(chat);
   }
-  async remove(chatId: number, database: string) {
-    const client = await this.mongoDb.getClient();
-    const collection = client.db(database).collection('chatId');
+
+  async remove(chatId: number) {
+    const collection = this.client.db(this.database).collection(this.collectionName);
     await collection.updateOne(
       { chatId },
       {
@@ -45,15 +51,17 @@ export class MongoChatRepository extends ChatRepository {
       },
     );
   }
-  async chats(database: string): Promise<Chat[]> {
-    const client = await this.mongoDb.getClient();
-    const collection = client.db(database).collection('chatId');
+
+  async chats(): Promise<Chat[]> {
+    const collection = this.client.db(this.database).collection(this.collectionName);
     const documents = await collection.find().toArray();
-    return documents.map((doc) => doc as unknown as Chat).filter((doc) => doc.status === ChatStatus.ACTIVE);
+    return documents
+      .map((doc: unknown) => doc as unknown as Chat)
+      .filter((doc: { status: ChatStatus }) => doc.status === ChatStatus.ACTIVE);
   }
 
-  async exists(chatId: number, database: string): Promise<boolean> {
-    const chats = await this.chats(database);
+  async exists(chatId: number): Promise<boolean> {
+    const chats = await this.chats();
     return chats.some((chat) => chat.chatId === chatId && chat.status === ChatStatus.ACTIVE);
   }
 }

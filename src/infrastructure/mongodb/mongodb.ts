@@ -7,18 +7,20 @@ export const repositoryRegisterStoryFactory: ObjectFactory = () => {
   const mongoDb = new MongoClient(
     `${config.mongoDbDriver}://${config.mongoDbUsename}:${config.mongoDbPassword}@${config.mongoDbUri}/?retryWrites=true&w=majority`,
   );
-  return new MongoDb(mongoDb, config.mongoDbDatabase);
+  return new MongoDb(mongoDb);
 };
 
 @Factory(repositoryRegisterStoryFactory)
 export class MongoDb {
-  constructor(@Inject private client: MongoClient, private database: string) {
-    this.database;
-  }
+  constructor(@Inject private client: MongoClient) {}
 
   async connect() {
-    await this.client.connect();
-    console.log('Conectado ao MongoDB');
+    try {
+      await this.client.connect();
+      console.log('Conectado ao MongoDB');
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async getClient() {
