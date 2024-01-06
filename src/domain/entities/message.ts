@@ -1,6 +1,6 @@
 export interface Messages {
-  messageId: number;
-  chatId: number;
+  messageId: string;
+  chatId: string;
   gameId: number;
   eventId: number;
   message: string;

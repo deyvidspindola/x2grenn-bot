@@ -7,6 +7,7 @@ import { Chat } from '../domain/entities/chat';
 import { MessageRepository } from '../domain/message-repository';
 import { Messages } from '../domain/entities/message';
 import { BotWinsRepository } from '../domain/bots/repository/bot-wins-repository';
+import { BetRepository } from '../domain/bet-repository';
 
 let send = [];
 const diffs = {
@@ -26,9 +27,12 @@ export class BotWinsUseCase {
     private readonly chat: ChatRepository,
     @Inject
     private readonly message: MessageRepository,
+    @Inject
+    private readonly betRepository: BetRepository,
   ) {
     this.chat.init(this.configuration.mongoDbWinsDatabase);
     this.message.init(this.configuration.mongoDbWinsDatabase);
+    this.betRepository.init(this.configuration.mongoDbWinsDatabase);
     this.requests.setApiKey(this.configuration.betBotWinsApiKey);
   }
 
@@ -37,13 +41,14 @@ export class BotWinsUseCase {
       const chats = await this.chat.chats();
       if (!chats.length) return;
       const bets = await this.requests.execute('Esoccer');
-      this.sendMessageWins(bets, chats);
+      this.sendMessageDiffGols(bets, chats);
+      this.saveBets(bets);
     } catch (error) {
       console.log(error);
     }
   }
 
-  private sendMessageWins = async (bets: any, chats: Chat[]) => {
+  private sendMessageDiffGols = async (bets: any, chats: Chat[]) => {
     for (const bet of bets) {
       if (bet && bet.ss && bet.time_status == 1) {
         const result = bet.ss.split('-');
@@ -56,26 +61,41 @@ export class BotWinsUseCase {
           const title = `${home} <b>${bet.ss}</b> ${away}`;
           const message = `${league}\n${title}\n<b>Diferença de gols</b>: ${diff}\n${this.configuration.betUrl}${bet.ev_id}`;
           this.sendMessage(message, chats, bet);
-          // send.push(bet.id);
+          send.push(bet.id);
         }
       }
     }
   };
 
   private async sendMessage(message: string, chats: Chat[], bet: any) {
+    let msgId = [];
+    let chatId = [];
     for (const chat of chats) {
       const msg = await this.botWinsRepository.sendMessage({
         chatId: chat.chatId.toString(),
         message,
       });
-      await this.message.save({
-        messageId: msg.message_id,
-        chatId: chat.chatId,
-        gameId: bet.id,
-        eventId: bet.ev_id,
-        message: message,
+      chatId.push(chat.chatId);
+      msgId.push(msg.message_id);
+    }
+    await this.message.save({
+      messageId: JSON.stringify(msgId),
+      chatId: JSON.stringify(chatId),
+      gameId: bet.id,
+      eventId: bet.ev_id,
+      message: message,
+      createdAt: new Date(),
+    } as Messages);
+  }
+
+  private saveBets(bets: any) {
+    for (const bet of bets) {
+      this.betRepository.save({
+        betId: bet.id,
+        bet: JSON.stringify(bet),
         createdAt: new Date(),
-      } as Messages);
+        updatedAt: new Date(),
+      });
     }
   }
 

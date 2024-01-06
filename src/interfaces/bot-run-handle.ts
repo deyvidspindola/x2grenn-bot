@@ -6,6 +6,7 @@ import { Configurations } from '../infrastructure/configuration/configurations';
 import { BotDiffGolsRepository } from '../domain/bots/repository/bot-diff-gols-repository';
 import { BotWinsUseCase } from '../application/bot-wins-use-case';
 import { BotWinsRepository } from '../domain/bots/repository/bot-wins-repository';
+import { BotDiffGolsReportUseCase } from '../application/bot-diff-gols/bot-diff-gols-report-use-case';
 
 export class BotRunHandle {
   constructor(
@@ -19,27 +20,33 @@ export class BotRunHandle {
     const botDiffGolsUseCase = Container.get(BotDiffGolsUseCase);
     const botDiffGolsRepository = Container.get(BotDiffGolsRepository);
     await botDiffGolsRepository.start();
+    await botDiffGolsRepository.sendMessage({
+      chatId: this.configuration.telegramDefaultChatId,
+      message: 'Estamos Rodando',
+    });
     schedule('*/1 * * * * *', async () => {
       await botDiffGolsUseCase.execute();
     });
 
-    // Remove mensagens
-    schedule('0 0 */1 * * *', async () => {
-      console.log('Removendo mensagens');
-      await this.mensage.init(this.configuration.mongoDbDiffGolsDatabase);
-      await this.mensage.removeMessages();
-      await botDiffGolsRepository.sendMessage({
-        chatId: this.configuration.telegramDefaultChatId,
-        message: 'Removendo mensagens',
-      });
-    });
+    // // Remove mensagens
+    // schedule('0 0 */1 * * *', async () => {
+    //   console.log('Removendo mensagens');
+    //   await this.mensage.init(this.configuration.mongoDbDiffGolsDatabase);
+    //   await this.mensage.removeMessages();
+    //   await botDiffGolsRepository.sendMessage({
+    //     chatId: this.configuration.telegramDefaultChatId,
+    //     message: 'Removendo mensagens',
+    //   });
+    // });
   }
 
   // Bot Wins
   async runBotWins() {
     const botWinsUseCase = Container.get(BotWinsUseCase);
+    const botreport = Container.get(BotDiffGolsReportUseCase);
     const botWinsRepository = Container.get(BotWinsRepository);
     await botWinsRepository.start();
+    botreport.execute();
     schedule('*/1 * * * * *', async () => {
       await botWinsUseCase.execute();
     });

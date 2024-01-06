@@ -7,6 +7,7 @@ import { Chat } from '../domain/entities/chat';
 import { MessageRepository } from '../domain/message-repository';
 import { Messages } from '../domain/entities/message';
 import { BotDiffGolsRepository } from '../domain/bots/repository/bot-diff-gols-repository';
+import { BetRepository } from '../domain/bet-repository';
 
 let send = [];
 const diffs = {
@@ -26,9 +27,12 @@ export class BotDiffGolsUseCase {
     private readonly chat: ChatRepository,
     @Inject
     private readonly message: MessageRepository,
+    @Inject
+    private readonly betRepository: BetRepository,
   ) {
     this.chat.init(this.configuration.mongoDbDiffGolsDatabase);
     this.message.init(this.configuration.mongoDbDiffGolsDatabase);
+    this.betRepository.init(this.configuration.mongoDbDiffGolsDatabase);
     this.requests.setApiKey(this.configuration.betBotDiffGolsApiKey);
   }
 
@@ -38,6 +42,7 @@ export class BotDiffGolsUseCase {
       if (!chats.length) return;
       const bets = await this.requests.execute('Esoccer');
       this.sendMessageDiffGols(bets, chats);
+      this.saveBets(bets);
     } catch (error) {
       console.log(error);
     }
@@ -63,19 +68,34 @@ export class BotDiffGolsUseCase {
   };
 
   private async sendMessage(message: string, chats: Chat[], bet: any) {
+    let msgId = [];
+    let chatId = [];
     for (const chat of chats) {
       const msg = await this.botDiffGolsRepository.sendMessage({
         chatId: chat.chatId.toString(),
         message,
       });
-      await this.message.save({
-        messageId: msg.message_id,
-        chatId: chat.chatId,
-        gameId: bet.id,
-        eventId: bet.ev_id,
-        message: message,
+      chatId.push(chat.chatId);
+      msgId.push(msg.message_id);
+    }
+    await this.message.save({
+      messageId: JSON.stringify(msgId),
+      chatId: JSON.stringify(chatId),
+      gameId: bet.id,
+      eventId: bet.ev_id,
+      message: message,
+      createdAt: new Date(),
+    } as Messages);
+  }
+
+  private saveBets(bets: any) {
+    for (const bet of bets) {
+      this.betRepository.save({
+        betId: bet.id,
+        bet: JSON.stringify(bet),
         createdAt: new Date(),
-      } as Messages);
+        updatedAt: new Date(),
+      });
     }
   }
 

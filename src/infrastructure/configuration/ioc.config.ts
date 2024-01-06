@@ -12,6 +12,8 @@ import { MessageRepository } from '../../domain/message-repository';
 import { MongoMessageRepository } from '../mongodb/repositories/mongo-message-repository';
 import { BotDiffGolsRepository } from '../../domain/bots/repository/bot-diff-gols-repository';
 import { BotWinsRepository } from '../../domain/bots/repository/bot-wins-repository';
+import { BetRepository } from '../../domain/bet-repository';
+import { MongoBetRepository } from '../mongodb/repositories/mongo-bet-repository';
 
 const configDevFile = () => yaml.load(fs.readFileSync('config/server-config.yml', 'utf8'));
 
@@ -23,4 +25,5 @@ export default [
   { bind: MessageRepository, to: MongoMessageRepository },
   { bind: ConfigurationRepository, to: MongoConfigurationRepository },
   { bind: RequestsRepository, to: BetRequestsRepository },
+  { bind: BetRepository, to: MongoBetRepository },
 ];
