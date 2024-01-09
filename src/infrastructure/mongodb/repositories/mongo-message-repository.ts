@@ -23,10 +23,19 @@ export class MongoMessageRepository implements MessageRepository {
     await collection.insertOne(message);
   }
 
-  async messages(): Promise<Messages[]> {
+  async messages(filters: any = null): Promise<Messages[]> {
     const collection = this.client.db(this.database).collection(this.collectionName);
-    const documents = await collection.find().toArray();
-    return documents.map((doc: unknown) => doc as unknown as Messages);
+    let query = {};
+    if (filters !== null) {
+      query = {
+        createdAt: {
+          $gte: filters.startDate,
+          $lte: filters.endDate,
+        },
+      };
+    }
+    const documents: any[] = await collection.find(query).toArray();
+    return documents.map((doc: any) => doc as Messages);
   }
 
   async removeMessages() {

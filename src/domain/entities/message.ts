@@ -1,14 +1,14 @@
 export interface Messages {
   messageId: string;
   chatId: string;
-  gameId: number;
+  betId: number;
   eventId: number;
   message: string;
   createdAt: Date;
 }
 
 export interface GetMessage {
-  gameId: number;
+  betId: number;
 }
 
 export interface sendMessage {

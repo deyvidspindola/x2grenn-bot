@@ -8,6 +8,7 @@ import { MessageRepository } from '../domain/message-repository';
 import { Messages } from '../domain/entities/message';
 import { BotWinsRepository } from '../domain/bots/repository/bot-wins-repository';
 import { BetRepository } from '../domain/bet-repository';
+import { _todayNow } from './utils';
 
 let send = [];
 const diffs = {
@@ -61,15 +62,15 @@ export class BotWinsUseCase {
           const title = `${home} <b>${bet.ss}</b> ${away}`;
           const message = `${league}\n${title}\n<b>Diferença de gols</b>: ${diff}\n${this.configuration.betUrl}${bet.ev_id}`;
           this.sendMessage(message, chats, bet);
-          send.push(bet.id);
+          // send.push(bet.id);
         }
       }
     }
   };
 
   private async sendMessage(message: string, chats: Chat[], bet: any) {
-    let msgId = [];
-    let chatId = [];
+    let msgId: any[],
+      chatId = [];
     for (const chat of chats) {
       const msg = await this.botWinsRepository.sendMessage({
         chatId: chat.chatId.toString(),
@@ -81,10 +82,10 @@ export class BotWinsUseCase {
     await this.message.save({
       messageId: JSON.stringify(msgId),
       chatId: JSON.stringify(chatId),
-      gameId: bet.id,
+      betId: bet.id,
       eventId: bet.ev_id,
       message: message,
-      createdAt: new Date(),
+      createdAt: _todayNow(),
     } as Messages);
   }
 

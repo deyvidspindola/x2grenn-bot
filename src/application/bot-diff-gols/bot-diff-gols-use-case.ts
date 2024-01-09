@@ -1,13 +1,14 @@
 import { Inject } from 'typescript-ioc';
-
-import { ChatRepository } from '../domain/chat-repository';
-import { RequestsRepository } from '../domain/requests-repository';
-import { Configurations } from '../infrastructure/configuration/configurations';
-import { Chat } from '../domain/entities/chat';
-import { MessageRepository } from '../domain/message-repository';
-import { Messages } from '../domain/entities/message';
-import { BotDiffGolsRepository } from '../domain/bots/repository/bot-diff-gols-repository';
-import { BetRepository } from '../domain/bet-repository';
+import { schedule } from 'node-cron';
+import { ChatRepository } from '../../domain/chat-repository';
+import { RequestsRepository } from '../../domain/requests-repository';
+import { Configurations } from '../../infrastructure/configuration/configurations';
+import { Chat } from '../../domain/entities/chat';
+import { MessageRepository } from '../../domain/message-repository';
+import { Messages } from '../../domain/entities/message';
+import { BotDiffGolsRepository } from '../../domain/bots/repository/bot-diff-gols-repository';
+import { BetRepository } from '../../domain/bet-repository';
+import { _todayNow, calcDiff, extrairNumero, formatTeam } from '../utils';
 
 let send = [];
 const diffs = {
@@ -37,6 +38,17 @@ export class BotDiffGolsUseCase {
   }
 
   public async execute() {
+    await this.botDiffGolsRepository.start();
+    await this.botDiffGolsRepository.sendMessage({
+      chatId: this.configuration.telegramDefaultChatId,
+      message: 'Bot Diff Gols is running',
+    });
+    schedule('*/1 * * * * *', async () => {
+      await this.process();
+    });
+  }
+
+  private async process() {
     try {
       const chats = await this.chat.chats();
       if (!chats.length) return;
@@ -51,13 +63,12 @@ export class BotDiffGolsUseCase {
   private sendMessageDiffGols = async (bets: any, chats: Chat[]) => {
     for (const bet of bets) {
       if (bet && bet.ss && bet.time_status == 1) {
-        const result = bet.ss.split('-');
-        const numeroExtraido = this.extrairNumero(bet.league.name);
-        const diff = Math.abs(parseInt(result[0]) - parseInt(result[1]));
+        const numeroExtraido = extrairNumero(bet.league.name);
+        const diff = calcDiff(bet.ss);
         if (diff >= diffs[numeroExtraido] && !send.includes(bet.id)) {
           const league = `<b>${bet.league.name}</b>`;
-          const home = this.formatTeam(bet.home.name);
-          const away = this.formatTeam(bet.away.name);
+          const home = formatTeam(bet.home.name);
+          const away = formatTeam(bet.away.name);
           const title = `${home} <b>${bet.ss}</b> ${away}`;
           const message = `${league}\n${title}\n<b>Diferença de gols</b>: ${diff}\n${this.configuration.betUrl}${bet.ev_id}`;
           this.sendMessage(message, chats, bet);
@@ -68,23 +79,23 @@ export class BotDiffGolsUseCase {
   };
 
   private async sendMessage(message: string, chats: Chat[], bet: any) {
-    let msgId = [];
+    let msgId: any[] = [];
     let chatId = [];
     for (const chat of chats) {
       const msg = await this.botDiffGolsRepository.sendMessage({
         chatId: chat.chatId.toString(),
         message,
       });
-      chatId.push(chat.chatId);
       msgId.push(msg.message_id);
+      chatId.push(chat.chatId);
     }
     await this.message.save({
       messageId: JSON.stringify(msgId),
       chatId: JSON.stringify(chatId),
-      gameId: bet.id,
+      betId: bet.id,
       eventId: bet.ev_id,
       message: message,
-      createdAt: new Date(),
+      createdAt: _todayNow(),
     } as Messages);
   }
 
@@ -93,21 +104,9 @@ export class BotDiffGolsUseCase {
       this.betRepository.save({
         betId: bet.id,
         bet: JSON.stringify(bet),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: _todayNow(),
+        updatedAt: _todayNow(),
       });
     }
-  }
-
-  private extrairNumero = (texto: string) => {
-    const regex = /\b(\d+)\b/;
-    const match = texto.match(regex);
-    return match ? parseInt(match[1], 10) : null;
-  };
-
-  private formatTeam(team: string) {
-    const formattedName = team.replace(/\(([^)]+)\)/, (_, name) => `(<b>${name}</b>)`);
-    const newTeam = formattedName.replace(' Esports', '');
-    return newTeam;
   }
 }
