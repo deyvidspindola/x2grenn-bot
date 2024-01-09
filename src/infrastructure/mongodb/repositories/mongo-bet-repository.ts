@@ -2,6 +2,7 @@ import { Inject } from 'typescript-ioc';
 import { MongoDb } from '../mongodb';
 import { Bet, BetFilters } from '../../../domain/entities/bet';
 import { BetRepository } from '../../../domain/bet-repository';
+import { _todayNow } from '../../../application/utils';
 
 export class MongoBetRepository implements BetRepository {
   constructor(
@@ -27,7 +28,7 @@ export class MongoBetRepository implements BetRepository {
         {
           $set: {
             bet: bet.bet,
-            updatedAt: new Date(),
+            updatedAt: _todayNow(),
           },
         },
       );
