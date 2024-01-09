@@ -18,7 +18,10 @@ export const calcDiff = (ss: string) => {
   return Math.abs(parseInt(result[0]) - parseInt(result[1]));
 };
 
-export const _today = () => {
+export const _today = (type?: string) => {
+  if (type && type == 'br') {
+    return moment().format('DD/MM/YYYY');
+  }
   return moment().format('YYYY-MM-DD');
 };
 
@@ -27,7 +30,10 @@ export const _todayNow = () => {
   return new Date(_today() + `T${time.slice(0, 2)}:${time.slice(3, 5)}:${time.slice(6, 8)}.${time.slice(9, 12)}Z`);
 };
 
-export const _yesterday = () => {
+export const _yesterday = (type?: string) => {
+  if (type && type == 'br') {
+    return moment().subtract(1, 'days').format('DD/MM/YYYY');
+  }
   return moment().subtract(1, 'days').format('YYYY-MM-DD');
 };
 

@@ -64,7 +64,7 @@ export class BotDiffGolsReportUseCase {
       this.botDiffGolsRepository.sendMessage({
         chatId: this.configuration.telegramDefaultChatId,
         message: `
-        Relatório de <b>${_today()}</b>
+        Relatório de <b>${_yesterday('br')}</b>
 
         -------------[ <b>Total de Jogos</b> ]-------------
         8 minutos: <b>${betResults.filter((b: any) => b.bet.includes('8 mins')).length}</b>
