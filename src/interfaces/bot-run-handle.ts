@@ -6,9 +6,7 @@ export class BotRunHandle {
   constructor() {}
 
   async runBotDiffGols() {
-    const botDiffGolsUseCase = Container.get(BotDiffGolsUseCase);
-    const botDiffGolsReportUseCase = Container.get(BotDiffGolsReportUseCase);
-    await botDiffGolsUseCase.execute();
-    await botDiffGolsReportUseCase.execute();
+    await Container.get(BotDiffGolsUseCase).execute();
+    await Container.get(BotDiffGolsReportUseCase).execute();
   }
 }

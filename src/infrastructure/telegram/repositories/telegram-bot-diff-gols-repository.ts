@@ -6,6 +6,8 @@ import { Chat } from '../../../domain/entities/chat';
 import { ChatRepository } from '../../../domain/chat-repository';
 import { Configurations } from '../../configuration/configurations';
 import { BotDiffGolsRepository } from '../../../domain/bots/repository/bot-diff-gols-repository';
+import { BotDiffGolsReportUseCase } from '../../../application/bot-diff-gols/bot-diff-gols-report-use-case';
+import { _today } from '../../../application/utils';
 
 export const repositoryRegisterStoryFactory: ObjectFactory = () => {
   const config = Container.get(Configurations);
@@ -32,6 +34,7 @@ export class TelegramBotDiffGolsRepository implements BotDiffGolsRepository {
     this.client.start();
     await this.subscribe();
     await this.unsubscribe();
+    await this.report();
     console.log('Conectado ao BOT Diff Gols');
   }
 
@@ -86,6 +89,23 @@ export class TelegramBotDiffGolsRepository implements BotDiffGolsRepository {
       const message = `Olá ${name}, que pena que você está saindo.\nPara se cadastrar digite /start`;
       this.chat.remove(chatId);
       this.sendMessage({ chatId: chatId.toString(), message });
+    });
+  }
+
+  async report() {
+    this.client.command('report', async (ctx) => {
+      const chatId = ctx.chat?.id;
+      const firstName = ctx.from?.first_name;
+      const lastName = ctx.from?.last_name;
+      const name = `<b>${firstName} ${lastName}</b>`;
+      if (!(await this.chat.exists(chatId))) {
+        this.sendMessage({
+          chatId: chatId.toString(),
+          message: `Olá, ${name}! Você não está cadastrado!\nPara se cadastrar digite /start`,
+        });
+        return;
+      }
+      await Container.get(BotDiffGolsReportUseCase).sendPartialReport(chatId.toString());
     });
   }
 }
