@@ -47,6 +47,9 @@ export class BotDiffGolsUseCase {
 
     schedule('*/1 * * * * *', async () => {
       await this.process();
+    });
+
+    schedule('*/5 * * * * *', async () => {
       await this.editMessage();
     });
   }
@@ -130,7 +133,7 @@ export class BotDiffGolsUseCase {
       const chatId = JSON.parse(msg.chatId);
       const bet = await this.betRepository.bets({ ...filter, betId: msg.betId.toString() });
       if (!bet.length) continue;
-      if (moment().diff(moment(bet[0].updatedAt), 'seconds') > 3) {
+      if (moment().diff(moment(bet[0].updatedAt), 'seconds') > 5) {
         const result = JSON.parse(bet[0].bet);
         const diff = calcDiff(result.ss);
         const home = formatTeam(result.home.name);
