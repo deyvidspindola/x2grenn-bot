@@ -129,36 +129,39 @@ export class BotDiffGolsUseCase {
     };
     const messages = await this.message.messages({ ...filter, edited: false });
     for (const msg of messages) {
-      // const messageId = JSON.parse(msg.messageId);
-      // const chatId = JSON.parse(msg.chatId);
+      const messageId = JSON.parse(msg.messageId);
+      const chatId = JSON.parse(msg.chatId);
       const bet = await this.betRepository.bets({ ...filter, betId: msg.betId.toString() });
       if (!bet.length) continue;
-      console.log(moment().diff(moment(bet[0].updatedAt), 'seconds'));
-      console.log(moment().diff(moment(bet[0].updatedAt), 'seconds') > 10);
-      // if (moment().diff(moment(bet[0].updatedAt), 'seconds') > 10) {
-      //   const result = JSON.parse(bet[0].bet);
-      //   const diff = calcDiff(result.ss);
-      //   const home = formatTeam(result.home.name);
-      //   const away = formatTeam(result.away.name);
+      console.log(
+        `${msg.betId}|${moment().diff(moment(bet[0].updatedAt), 'seconds')}|${
+          moment().diff(moment(bet[0].updatedAt), 'seconds') > 10801
+        }`,
+      );
+      if (moment().diff(moment(bet[0].updatedAt), 'seconds') > 10801) {
+        const result = JSON.parse(bet[0].bet);
+        const diff = calcDiff(result.ss);
+        const home = formatTeam(result.home.name);
+        const away = formatTeam(result.away.name);
 
-      //   let message = msg.message;
-      //   message =
-      //     message +
-      //     `
-      //   ------------------------------------
-      //   <b>** FIM DE JOGO **</b>
-      //   ${home} <b>${result.ss}</b> ${away}
-      //   <b>Diferença de gols</b>: ${diff}
-      //   `;
-      //   for (let i = 0; i < messageId.length; i++) {
-      //     await this.botDiffGolsRepository.editMessage({
-      //       chatId: this.configuration.telegramDefaultChatId,
-      //       messageId: messageId[i],
-      //       message: message.replace(/^\s+/gm, ''),
-      //     });
-      //   }
-      //   // await this.message.update(msg._id);
-      // }
+        let message = msg.message;
+        message =
+          message +
+          `
+        ------------------------------------
+        <b>** FIM DE JOGO **</b>
+        ${home} <b>${result.ss}</b> ${away}
+        <b>Diferença de gols</b>: ${diff}
+        `;
+        for (let i = 0; i < messageId.length; i++) {
+          await this.botDiffGolsRepository.editMessage({
+            chatId: chatId[i],
+            messageId: messageId[i],
+            message: message.replace(/^\s+/gm, ''),
+          });
+        }
+        await this.message.update(msg._id);
+      }
     }
   }
 }
