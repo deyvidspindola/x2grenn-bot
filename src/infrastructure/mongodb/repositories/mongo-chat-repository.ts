@@ -3,6 +3,7 @@ import { MongoDb } from '../mongodb';
 import { Chat } from '../../../domain/entities/chat';
 import { ChatRepository } from '../../../domain/chat-repository';
 import { ChatStatus } from '../../../domain/entities/enums/chat-status';
+import { _todayNow } from '../../../application/utils';
 
 export class MongoChatRepository implements ChatRepository {
   constructor(
@@ -28,7 +29,7 @@ export class MongoChatRepository implements ChatRepository {
         {
           $set: {
             status: chat.status,
-            updatedAt: new Date(),
+            updatedAt: _todayNow(),
             deletedAt: null,
           },
         },
@@ -45,8 +46,8 @@ export class MongoChatRepository implements ChatRepository {
       {
         $set: {
           status: ChatStatus.INACTIVE,
-          deletedAt: new Date(),
-          updatedAt: new Date(),
+          deletedAt: _todayNow(),
+          updatedAt: _todayNow(),
         },
       },
     );

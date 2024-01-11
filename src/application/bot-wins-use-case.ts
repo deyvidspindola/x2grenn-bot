@@ -94,8 +94,8 @@ export class BotWinsUseCase {
       this.betRepository.save({
         betId: bet.id,
         bet: JSON.stringify(bet),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: _todayNow(),
+        updatedAt: _todayNow(),
       });
     }
   }

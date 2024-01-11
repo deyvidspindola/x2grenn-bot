@@ -75,7 +75,7 @@ export class BotDiffGolsReportUseCase {
       endDate: _endDate(date),
     };
     await this.betRepository.init(this.configuration.mongoDbDiffGolsDatabase);
-    const betResults = await this.betRepository.oldBets(filter);
+    const betResults = await this.betRepository.bets(filter);
     const messages = await this.message.messages(filter);
 
     // Initialize counters for the reports
@@ -115,10 +115,10 @@ export class BotDiffGolsReportUseCase {
 
     if (partial) {
       message = `
-      **************************************************
+      *************************************
       <i>Esse é um relatório parcial do dia: <b>${dt}</b>.
       Lembrando que o relatório é enviado todos os dias às 00:00. Com todos os jogos do dia anterior.</i>
-      **************************************************
+      *************************************
       .
       .`;
     }

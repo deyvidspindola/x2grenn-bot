@@ -37,16 +37,19 @@ export class MongoBetRepository implements BetRepository {
     await collection.insertOne(bet);
   }
 
-  async oldBets(filters: BetFilters) {
+  async bets(filters: BetFilters) {
     const collection = this.client.db(this.database).collection(this.collectionName);
-    const documents = await collection
-      .find({
+    let query = {};
+    if (filters !== null) {
+      query = {
         createdAt: {
           $gte: filters.startDate,
           $lte: filters.endDate,
         },
-      })
-      .toArray();
+        ...(filters.betId ? { betId: filters.betId } : {}),
+      };
+    }
+    const documents = await collection.find(query).toArray();
     return documents;
   }
 }

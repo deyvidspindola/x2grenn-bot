@@ -23,6 +23,18 @@ export class MongoMessageRepository implements MessageRepository {
     await collection.insertOne(message);
   }
 
+  async update(message_id: string) {
+    const collection = this.client.db(this.database).collection(this.collectionName);
+    await collection.updateOne(
+      { _id: message_id },
+      {
+        $set: {
+          edited: true,
+        },
+      },
+    );
+  }
+
   async messages(filters: any = null): Promise<Messages[]> {
     const collection = this.client.db(this.database).collection(this.collectionName);
     let query = {};
@@ -33,6 +45,16 @@ export class MongoMessageRepository implements MessageRepository {
           $lte: filters.endDate,
         },
       };
+      if (filters.edited !== undefined) {
+        if ('edited' in query) {
+          query.edited = filters.edited;
+        } else {
+          query = {
+            ...query,
+            edited: filters.edited,
+          };
+        }
+      }
     }
     const documents: any[] = await collection.find(query).toArray();
     return documents.map((doc: any) => doc as Messages);

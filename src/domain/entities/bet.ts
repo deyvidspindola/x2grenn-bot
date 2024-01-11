@@ -6,6 +6,7 @@ export interface Bet {
 }
 
 export interface BetFilters {
+  betId?: string;
   startDate: Date;
   endDate: Date;
 }

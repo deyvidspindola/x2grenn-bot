@@ -1,11 +1,12 @@
 import { Container, Factory, Inject, ObjectFactory } from 'typescript-ioc';
-import { sendMessage } from '../../../domain/entities/message';
+import { editMessage, sendMessage } from '../../../domain/entities/message';
 import { Bot } from 'grammy';
 import { ChatStatus } from '../../../domain/entities/enums/chat-status';
 import { Chat } from '../../../domain/entities/chat';
 import { ChatRepository } from '../../../domain/chat-repository';
 import { Configurations } from '../../configuration/configurations';
 import { BotWinsRepository } from '../../../domain/bots/repository/bot-wins-repository';
+import { _todayNow } from '../../../application/utils';
 
 export const repositoryRegisterStoryFactory: ObjectFactory = () => {
   const config = Container.get(Configurations);
@@ -43,6 +44,14 @@ export class TelegramBotWinsRepository implements BotWinsRepository {
     });
   }
 
+  async editMessage(message: editMessage): Promise<any> {
+    console.log('entou aqui');
+    await this.client.api.editMessageText(message.chatId, Number(message.messageId), message.message, {
+      parse_mode: 'HTML',
+      link_preview_options: { is_disabled: true },
+    });
+  }
+
   async subscribe() {
     this.client.command('start', async (ctx) => {
       const chatId = ctx.chat?.id;
@@ -61,8 +70,8 @@ export class TelegramBotWinsRepository implements BotWinsRepository {
         firstName,
         lastName,
         chatId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: _todayNow(),
+        updatedAt: _todayNow(),
         status: ChatStatus.ACTIVE,
       };
       this.chat.save(data);

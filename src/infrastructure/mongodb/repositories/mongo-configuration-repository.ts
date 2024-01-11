@@ -2,6 +2,7 @@ import { Inject } from 'typescript-ioc';
 import { MongoDb } from '../mongodb';
 import { Configurations } from '../../configuration/configurations';
 import { ConfigurationRepository } from '../../../domain/configuration-repository';
+import { _todayNow } from '../../../application/utils';
 
 export class MongoConfigurationRepository implements ConfigurationRepository {
   constructor(
@@ -19,7 +20,7 @@ export class MongoConfigurationRepository implements ConfigurationRepository {
       {
         $set: {
           diffGols: diffGols,
-          updatedAt: new Date(),
+          updatedAt: _todayNow(),
         },
       },
     );

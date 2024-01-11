@@ -1,13 +1,13 @@
 import { Container, Factory, Inject, ObjectFactory } from 'typescript-ioc';
-import { sendMessage } from '../../../domain/entities/message';
-import { Bot } from 'grammy';
+import { editMessage, sendMessage } from '../../../domain/entities/message';
+import { Bot, GrammyError } from 'grammy';
 import { ChatStatus } from '../../../domain/entities/enums/chat-status';
 import { Chat } from '../../../domain/entities/chat';
 import { ChatRepository } from '../../../domain/chat-repository';
 import { Configurations } from '../../configuration/configurations';
 import { BotDiffGolsRepository } from '../../../domain/bots/repository/bot-diff-gols-repository';
 import { BotDiffGolsReportUseCase } from '../../../application/bot-diff-gols/bot-diff-gols-report-use-case';
-import { _today } from '../../../application/utils';
+import { _todayNow } from '../../../application/utils';
 
 export const repositoryRegisterStoryFactory: ObjectFactory = () => {
   const config = Container.get(Configurations);
@@ -39,10 +39,24 @@ export class TelegramBotDiffGolsRepository implements BotDiffGolsRepository {
   }
 
   async sendMessage(message: sendMessage): Promise<any> {
-    return await this.client.api.sendMessage(message.chatId, message.message, {
+    return await this.client.api
+      .sendMessage(message.chatId, message.message, {
+        parse_mode: 'HTML',
+        link_preview_options: { is_disabled: true },
+        protect_content: true,
+      })
+      .catch(async (err: GrammyError) => {
+        if (err.error_code === 403) {
+          await this.chat.remove(Number(message.chatId));
+        }
+        throw err;
+      });
+  }
+
+  async editMessage(message: editMessage): Promise<any> {
+    await this.client.api.editMessageText(message.chatId, Number(message.messageId), message.message, {
       parse_mode: 'HTML',
       link_preview_options: { is_disabled: true },
-      protect_content: true,
     });
   }
 
@@ -64,8 +78,8 @@ export class TelegramBotDiffGolsRepository implements BotDiffGolsRepository {
         firstName,
         lastName,
         chatId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: _todayNow(),
+        updatedAt: _todayNow(),
         status: ChatStatus.ACTIVE,
       };
       this.chat.save(data);
