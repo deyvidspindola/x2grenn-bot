@@ -135,10 +135,10 @@ export class BotDiffGolsUseCase {
       if (!bet.length) continue;
       console.log(
         `${msg.betId}|${moment().diff(moment(bet[0].updatedAt), 'seconds')}|${
-          moment().diff(moment(bet[0].updatedAt), 'seconds') > 10801
+          moment().diff(moment(bet[0].updatedAt), 'seconds') > 10810
         }`,
       );
-      if (moment().diff(moment(bet[0].updatedAt), 'seconds') > 10801) {
+      if (moment().diff(moment(bet[0].updatedAt), 'seconds') > 10810) {
         const result = JSON.parse(bet[0].bet);
         const diff = calcDiff(result.ss);
         const home = formatTeam(result.home.name);
