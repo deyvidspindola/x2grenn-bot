@@ -13,9 +13,27 @@ export const formatTeam = (team: string) => {
   return newTeam;
 };
 
-export const calcDiff = (ss: string) => {
+export const _diff = (gameTime: number) => {
+  switch (gameTime) {
+    case 8:
+      return 3;
+    case 10:
+      return 4;
+    case 12:
+      return 4;
+    default:
+      return 3;
+  }
+};
+
+export const calcDiff = (ss: string, game: string) => {
+  const value = _diff(extrairNumero(game));
   const result = ss.split('-');
-  return Math.abs(parseInt(result[0]) - parseInt(result[1]));
+  const diff = Math.abs(parseInt(result[0]) - parseInt(result[1]));
+  return {
+    diff: diff,
+    result: diff >= value,
+  };
 };
 
 export const _today = (type?: string) => {

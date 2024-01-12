@@ -8,15 +8,9 @@ import { MessageRepository } from '../../domain/message-repository';
 import { Messages } from '../../domain/entities/message';
 import { BotDiffGolsRepository } from '../../domain/bots/repository/bot-diff-gols-repository';
 import { BetRepository } from '../../domain/bet-repository';
-import { _endDate, _startDate, _today, _todayNow, calcDiff, extrairNumero, formatTeam } from '../utils';
-import moment from 'moment';
+import { _endDate, _startDate, _today, _todayNow, calcDiff, formatTeam } from '../utils';
 
 let send = [];
-const diffs = {
-  8: 3,
-  10: 4,
-  12: 4,
-};
 export class BotDiffGolsUseCase {
   constructor(
     @Inject
@@ -31,32 +25,44 @@ export class BotDiffGolsUseCase {
     private readonly message: MessageRepository,
     @Inject
     private readonly betRepository: BetRepository,
-  ) {
+  ) {}
+
+  public async execute() {
+    await this.initialize();
+    await this.startBot();
+  }
+
+  private async initialize() {
+    await this.botDiffGolsRepository.start();
+    await this.botDiffGolsRepository.sendMessage({
+      chatId: this.configuration.telegramDefaultChatId,
+      message: 'Bot Diff Gols is running',
+    });
+    this.initRepositories();
+  }
+
+  private initRepositories() {
     this.chat.init(this.configuration.mongoDbDiffGolsDatabase);
     this.message.init(this.configuration.mongoDbDiffGolsDatabase);
     this.betRepository.init(this.configuration.mongoDbDiffGolsDatabase);
     this.requests.setApiKey(this.configuration.betBotDiffGolsApiKey);
   }
 
-  public async execute() {
-    await this.botDiffGolsRepository.start();
-    await this.botDiffGolsRepository.sendMessage({
-      chatId: this.configuration.telegramDefaultChatId,
-      message: 'Bot Diff Gols is running',
-    });
-
+  private async startBot() {
     schedule('*/1 * * * * *', async () => {
       await this.process();
     });
 
-    schedule('*/5 * * * * *', async () => {
-      await this.editMessage();
+    schedule('0 * * * * *', async () => {
+      const lastbets = send.slice(-10);
+      send = [];
+      send.push(...lastbets);
     });
   }
 
   private async process() {
     try {
-      const chats = await this.chat.chats();
+      const chats = await this.chat.cacheChats();
       if (!chats.length) return;
       const bets = await this.requests.execute('Esoccer');
       this.sendMessageDiffGols(bets, chats);
@@ -67,42 +73,60 @@ export class BotDiffGolsUseCase {
   }
 
   private sendMessageDiffGols = async (bets: any, chats: Chat[]) => {
-    for (const bet of bets) {
-      if (bet && bet.ss && bet.time_status == 1) {
-        const numeroExtraido = extrairNumero(bet.league.name);
-        const diff = calcDiff(bet.ss);
-        if (diff >= diffs[numeroExtraido] && !send.includes(bet.id)) {
-          const league = `<b>${bet.league.name}</b>`;
-          const home = formatTeam(bet.home.name);
-          const away = formatTeam(bet.away.name);
-          const title = `${home} <b>${bet.ss}</b> ${away}`;
-          const message = `${league}\n${title}\n<b>Diferença de gols</b>: ${diff}\n${this.configuration.betUrl}${bet.ev_id}`;
-          this.sendMessage(message, chats, bet);
+    await Promise.all(
+      bets.map(async (bet: any) => {
+        if (this.shouldSendMessage(bet)) {
+          await this.sendMessageToChats(chats, bet);
           send.push(bet.id);
         }
-      }
-    }
+      }),
+    );
   };
 
-  private async sendMessage(message: string, chats: Chat[], bet: any) {
-    let msgId: any[] = [];
-    let chatId = [];
-    for (const chat of chats) {
-      let msg: any;
-      try {
-        msg = await this.botDiffGolsRepository.sendMessage({
-          chatId: chat.chatId.toString(),
-          message,
-        });
-      } catch (error) {
-        continue;
-      }
-      msgId.push(msg.message_id);
-      chatId.push(chat.chatId);
+  private shouldSendMessage(bet: any) {
+    if (!bet || !bet.ss || bet.time_status != 1) {
+      return false;
     }
+    const diff = calcDiff(bet.ss, bet.league.name);
+    return !send.includes(bet.id) && diff.result;
+  }
+
+  private createMessage(bet: any) {
+    const league = `<b>${bet.league.name}</b>`;
+    const home = formatTeam(bet.home.name);
+    const away = formatTeam(bet.away.name);
+    const title = `${home} <b>${bet.ss}</b> ${away}`;
+    const diff = calcDiff(bet.ss, bet.league.name).diff;
+    const message = `${league}\n${title}\n<b>Diferença de gols</b>: ${diff}\n${this.configuration.betUrl}${bet.ev_id}`;
+    return message;
+  }
+
+  private async sendMessageToChats(chats: Chat[], bet: any) {
+    const message = this.createMessage(bet);
+    const sentMessages = await Promise.all(
+      chats.map(async (chat) => {
+        try {
+          const msg = await this.botDiffGolsRepository.sendMessage({
+            chatId: chat.chatId.toString(),
+            message,
+          });
+          return msg.message_id;
+        } catch (error) {
+          return null;
+        }
+      }),
+    );
+
+    await this.saveMessages(sentMessages, chats, bet, message);
+  }
+
+  private async saveMessages(messageIds: (number | null)[], chats: Chat[], bet: any, message: string) {
+    const validMessageIds = messageIds.filter((id) => id !== null) as number[];
+    const chatIds = chats.map((chat) => chat.chatId);
+
     await this.message.save({
-      messageId: JSON.stringify(msgId),
-      chatId: JSON.stringify(chatId),
+      messageId: JSON.stringify(validMessageIds),
+      chatId: JSON.stringify(chatIds),
       betId: bet.id,
       eventId: bet.ev_id,
       message: message,
@@ -119,49 +143,6 @@ export class BotDiffGolsUseCase {
         createdAt: _todayNow(),
         updatedAt: _todayNow(),
       });
-    }
-  }
-
-  private async editMessage() {
-    const filter = {
-      startDate: _startDate(_today()),
-      endDate: _endDate(_today()),
-    };
-    const messages = await this.message.messages({ ...filter, edited: false });
-    for (const msg of messages) {
-      const messageId = JSON.parse(msg.messageId);
-      const chatId = JSON.parse(msg.chatId);
-      const bet = await this.betRepository.bets({ ...filter, betId: msg.betId.toString() });
-      if (!bet.length) continue;
-      console.log(
-        `${msg.betId}|${moment().diff(moment(bet[0].updatedAt), 'seconds')}|${
-          moment().diff(moment(bet[0].updatedAt), 'seconds') > 10810
-        }`,
-      );
-      if (moment().diff(moment(bet[0].updatedAt), 'seconds') > 10810) {
-        const result = JSON.parse(bet[0].bet);
-        const diff = calcDiff(result.ss);
-        const home = formatTeam(result.home.name);
-        const away = formatTeam(result.away.name);
-
-        let message = msg.message;
-        message =
-          message +
-          `
-        ------------------------------------
-        <b>** FIM DE JOGO **</b>
-        ${home} <b>${result.ss}</b> ${away}
-        <b>Diferença de gols</b>: ${diff}
-        `;
-        for (let i = 0; i < messageId.length; i++) {
-          await this.botDiffGolsRepository.editMessage({
-            chatId: chatId[i],
-            messageId: messageId[i],
-            message: message.replace(/^\s+/gm, ''),
-          });
-        }
-        await this.message.update(msg._id);
-      }
     }
   }
 }

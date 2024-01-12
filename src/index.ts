@@ -7,11 +7,8 @@ Container.configure(...config);
 Container.namespace(process.env.NODE_ENV || 'development');
 
 export const handler = async () => {
-  const mongoDb = Container.get(MongoDb);
-  const botRunHandle = Container.get(BotRunHandle);
-
-  await mongoDb.connect();
-  await botRunHandle.runBotDiffGols();
+  await Container.get(MongoDb).connect();
+  await Container.get(BotRunHandle).runBotDiffGols();
 };
 
 handler();

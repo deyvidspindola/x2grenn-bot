@@ -2,6 +2,7 @@ import { Inject } from 'typescript-ioc';
 import { MongoDb } from '../mongodb';
 import { Messages } from '../../../domain/entities/message';
 import { MessageRepository } from '../../../domain/message-repository';
+import * as memoryCache from 'memory-cache';
 
 export class MongoMessageRepository implements MessageRepository {
   constructor(
@@ -63,5 +64,16 @@ export class MongoMessageRepository implements MessageRepository {
   async removeMessages() {
     const collection = this.client.db(this.database).collection(this.collectionName);
     await collection.deleteMany({});
+  }
+
+  async cacheMessages(filters: any = null) {
+    const cacheKey = 'messages';
+    const cachedMessages = memoryCache.get(cacheKey);
+    if (cachedMessages) {
+      return cachedMessages;
+    }
+    const messages = await this.messages(filters);
+    memoryCache.put(cacheKey, messages, 60000);
+    return messages;
   }
 }

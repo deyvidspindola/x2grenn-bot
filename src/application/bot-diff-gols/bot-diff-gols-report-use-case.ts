@@ -27,10 +27,6 @@ export class BotDiffGolsReportUseCase {
   }
 
   async execute() {
-    await this.botDiffGolsRepository.sendMessage({
-      chatId: this.configuration.telegramDefaultChatId,
-      message: 'Bot Diff Gols Report is running',
-    });
     schedule('0 0 * * *', async () => {
       await this.sendReport();
     });
@@ -42,12 +38,12 @@ export class BotDiffGolsReportUseCase {
       const process = await this.process(date);
       const chats = await this.chat.chats();
       const message = await this.messageReport(date, process, false);
-      for (const chat of chats) {
+      chats.map(async (chat: any) => {
         await this.botDiffGolsRepository.sendMessage({
           chatId: chat.chatId.toString(),
           message: message,
         });
-      }
+      });
     } catch (error) {
       console.log(error);
       throw new Error(error);
@@ -88,13 +84,13 @@ export class BotDiffGolsReportUseCase {
       if (!bet) continue;
 
       const betResult = JSON.parse(bet.bet);
-      const diff = calcDiff(betResult.ss);
+      const diff = calcDiff(betResult.ss, betResult.league.name);
 
-      if (betResult.league.name.includes('8 mins') && diff <= 3) {
+      if (betResult.league.name.includes('8 mins') && !diff.result) {
         gamesLessThan3Goals8Mins++;
-      } else if (betResult.league.name.includes('10 mins') && diff <= 4) {
+      } else if (betResult.league.name.includes('10 mins') && !diff.result) {
         gamesLessThan4Goals10Mins++;
-      } else if (betResult.league.name.includes('12 mins') && diff <= 4) {
+      } else if (betResult.league.name.includes('12 mins') && !diff.result) {
         gamesLessThan4Goals12Mins++;
       }
     }

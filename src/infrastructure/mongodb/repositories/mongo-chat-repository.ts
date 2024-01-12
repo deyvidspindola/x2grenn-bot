@@ -4,6 +4,7 @@ import { Chat } from '../../../domain/entities/chat';
 import { ChatRepository } from '../../../domain/chat-repository';
 import { ChatStatus } from '../../../domain/entities/enums/chat-status';
 import { _todayNow } from '../../../application/utils';
+import * as memoryCache from 'memory-cache';
 
 export class MongoChatRepository implements ChatRepository {
   constructor(
@@ -64,5 +65,16 @@ export class MongoChatRepository implements ChatRepository {
   async exists(chatId: number): Promise<boolean> {
     const chats = await this.chats();
     return chats.some((chat) => chat.chatId === chatId && chat.status === ChatStatus.ACTIVE);
+  }
+
+  async cacheChats() {
+    const cacheKey = 'chats';
+    const cachedChats = memoryCache.get(cacheKey);
+    if (cachedChats) {
+      return cachedChats;
+    }
+    const chats = await this.chats();
+    memoryCache.put(cacheKey, chats, 60000);
+    return chats;
   }
 }
