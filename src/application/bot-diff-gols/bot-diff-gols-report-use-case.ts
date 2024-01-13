@@ -84,13 +84,13 @@ export class BotDiffGolsReportUseCase {
       if (!bet) continue;
 
       const betResult = JSON.parse(bet.bet);
-      const diff = calcDiff(betResult.ss, betResult.league.name);
+      const diff = calcDiff(betResult.ss, betResult.league.name).diff;
 
-      if (betResult.league.name.includes('8 mins') && !diff.result) {
+      if (betResult.league.name.includes('8 mins') && diff <= 3) {
         gamesLessThan3Goals8Mins++;
-      } else if (betResult.league.name.includes('10 mins') && !diff.result) {
+      } else if (betResult.league.name.includes('10 mins') && diff <= 4) {
         gamesLessThan4Goals10Mins++;
-      } else if (betResult.league.name.includes('12 mins') && !diff.result) {
+      } else if (betResult.league.name.includes('12 mins') && diff <= 4) {
         gamesLessThan4Goals12Mins++;
       }
     }
