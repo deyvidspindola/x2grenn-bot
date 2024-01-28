@@ -16,7 +16,6 @@ services:
       - "./mongod.conf:/etc/mongod.conf"
       - "./data:/data/db"
     command: ["mongod", "--config", "/etc/mongod.conf"]
-    restart: always
 
 networks:
   mongodb-net:
