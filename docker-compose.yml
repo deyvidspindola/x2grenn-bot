@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   mongodb:
-    image: mongo
+    image: mongo:latest
     container_name: mongodb-container-bottest
     ports:
       - "27017:27017"
@@ -10,5 +10,14 @@ services:
       MONGO_INITDB_DATABASE: betbot
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      - mongodb-net
     volumes:
+      - ./mongodb-config:/etc/mongod.conf
       - "./data:/data/db"
+    command: ["mongod", "--config", "/etc/mongod.conf"]
+    restart: always
+
+networks:
+  mongodb-net:
+    driver: bridge
