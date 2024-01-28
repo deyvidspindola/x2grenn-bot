@@ -49,7 +49,7 @@ export class BotDiffGolsUseCase {
   }
 
   private async startBot() {
-    schedule('*/1 * * * * *', async () => {
+    schedule('*/2 * * * * *', async () => {
       await this.process();
     });
 
@@ -123,7 +123,6 @@ export class BotDiffGolsUseCase {
   private async saveMessages(messageIds: (number | null)[], chats: Chat[], bet: any, message: string) {
     const validMessageIds = messageIds.filter((id) => id !== null) as number[];
     const chatIds = chats.map((chat) => chat.chatId);
-
     await this.message.save({
       messageId: JSON.stringify(validMessageIds),
       chatId: JSON.stringify(chatIds),

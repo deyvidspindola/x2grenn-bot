@@ -7,9 +7,9 @@
   "scripts": {
     "build": "npm run clean && tsc && copyfiles -u 1 src/**/*.json dist",
     "clean": "rimraf dist",
-    "start": "pm2 start ./dist/index.js --name devbotteste",
-    "restart": "npm rum build && pm2 restart devbotteste",
-    "stop": "pm2 stop devbotteste"
+    "start": "pm2 start ./dist/index.js --name botteste",
+    "restart": "npm rum build && pm2 restart botteste",
+    "stop": "pm2 stop botteste"
   },
   "author": "Deyvid Spindola",
   "license": "ISC",
