@@ -27,7 +27,7 @@ export class BotDiffGolsReportUseCase {
   }
 
   async execute() {
-    schedule('0 0 * * *', async () => {
+    schedule('0 3 * * *', async () => {
       await this.sendReport();
     });
   }
