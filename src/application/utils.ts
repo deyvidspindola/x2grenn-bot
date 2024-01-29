@@ -1,4 +1,5 @@
 import moment from 'moment-timezone';
+import { DiffGols } from '../domain/entities/enums/diffgols';
 moment.tz.setDefault('America/Sao_Paulo');
 
 export const extrairNumero = (texto: string) => {
@@ -16,13 +17,13 @@ export const formatTeam = (team: string) => {
 export const _diff = (gameTime: number) => {
   switch (gameTime) {
     case 8:
-      return 3;
+      return DiffGols.EIGHT_MIN;
     case 10:
-      return 4;
+      return DiffGols.TEN_MIN;
     case 12:
-      return 4;
+      return DiffGols.TWELVE_MIN;
     default:
-      return 3;
+      return DiffGols.EIGHT_MIN;
   }
 };
 

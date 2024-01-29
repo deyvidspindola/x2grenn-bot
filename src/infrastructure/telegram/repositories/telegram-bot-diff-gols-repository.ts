@@ -8,6 +8,7 @@ import { Configurations } from '../../configuration/configurations';
 import { BotDiffGolsRepository } from '../../../domain/bots/repository/bot-diff-gols-repository';
 import { BotDiffGolsReportUseCase } from '../../../application/bot-diff-gols/bot-diff-gols-report-use-case';
 import { _todayNow } from '../../../application/utils';
+import { BotDiffGolsEditMessageUseCase } from '../../../application/bot-diff-gols/bot-diff-gols-edit-message-use-case';
 
 export const repositoryRegisterStoryFactory: ObjectFactory = () => {
   const config = Container.get(Configurations);
@@ -35,6 +36,7 @@ export class TelegramBotDiffGolsRepository implements BotDiffGolsRepository {
     await this.subscribe();
     await this.unsubscribe();
     await this.report();
+    await this.forceEdit();
     console.log('Conectado ao BOT Diff Gols');
   }
 
@@ -120,6 +122,24 @@ export class TelegramBotDiffGolsRepository implements BotDiffGolsRepository {
         return;
       }
       await Container.get(BotDiffGolsReportUseCase).sendPartialReport(chatId.toString());
+    });
+  }
+
+  async forceEdit() {
+    this.client.command('forceEdit', async (ctx) => {
+      const chatId = ctx.chat?.id;
+      const firstName = ctx.from?.first_name;
+      const lastName = ctx.from?.last_name;
+      const name = `<b>${firstName} ${lastName}</b>`;
+      const chatDefault = this.config.telegramDefaultChatId;
+      if (chatId.toString() != chatDefault) {
+        this.sendMessage({
+          chatId: chatId.toString(),
+          message: `Olá, ${name}! Você não está autorizado a usar esse comando.`,
+        });
+        return;
+      }
+      await Container.get(BotDiffGolsEditMessageUseCase).process();
     });
   }
 }

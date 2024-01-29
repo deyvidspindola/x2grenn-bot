@@ -97,7 +97,7 @@ export class BotDiffGolsUseCase {
     const away = formatTeam(bet.away.name);
     const title = `${home} <b>${bet.ss}</b> ${away}`;
     const diff = calcDiff(bet.ss, bet.league.name).diff;
-    const message = `${league}\n${title}\n<b>Diferença de gols</b>: ${diff}\n${this.configuration.betUrl}${bet.ev_id}`;
+    const message = `⚽️ ${league}\n${title}\n<b>Diferença de gols</b>: ${diff}\n${this.configuration.betUrl}${bet.ev_id}`;
     return message;
   }
 

@@ -7,6 +7,7 @@ import { schedule } from 'node-cron';
 import { calcDiff, _yesterday, _startDate, _endDate, _today } from '../utils';
 import { ChatRepository } from '../../domain/chat-repository';
 import moment from 'moment';
+import { DiffGols } from '../../domain/entities/enums/diffgols';
 
 export class BotDiffGolsReportUseCase {
   constructor(
@@ -86,11 +87,11 @@ export class BotDiffGolsReportUseCase {
       const betResult = JSON.parse(bet.bet);
       const diff = calcDiff(betResult.ss, betResult.league.name).diff;
 
-      if (betResult.league.name.includes('8 mins') && diff <= 3) {
+      if (betResult.league.name.includes('8 mins') && diff <= DiffGols.EIGHT_MIN) {
         gamesLessThan3Goals8Mins++;
-      } else if (betResult.league.name.includes('10 mins') && diff <= 4) {
+      } else if (betResult.league.name.includes('10 mins') && diff <= DiffGols.TEN_MIN) {
         gamesLessThan4Goals10Mins++;
-      } else if (betResult.league.name.includes('12 mins') && diff <= 4) {
+      } else if (betResult.league.name.includes('12 mins') && diff <= DiffGols.TWELVE_MIN) {
         gamesLessThan4Goals12Mins++;
       }
     }

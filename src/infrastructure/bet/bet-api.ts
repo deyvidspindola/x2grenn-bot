@@ -2,11 +2,14 @@ import { Inject } from 'typescript-ioc';
 import { Configurations } from '../configuration/configurations';
 import axios from 'axios';
 import { Environments } from '../../domain/entities/enums/environment';
+import { BotDiffGolsRepository } from '../../domain/bots/repository/bot-diff-gols-repository';
 
 export class BetApi {
   constructor(
     @Inject
     private config: Configurations,
+    @Inject
+    private repository: BotDiffGolsRepository,
   ) {}
 
   betApiKey: string = '';
@@ -15,12 +18,22 @@ export class BetApi {
   }
 
   public async getBetsInplay(): Promise<any> {
-    if (this.config.environment === Environments.DEV) {
-      return this.getMock();
+    try {
+      if (this.config.environment === Environments.DEV) {
+        return this.getMock();
+      }
+      const url = `${this.config.betApiUrl}/v1/bet365/inplay_filter?sport_id=1&token=${this.betApiKey}`;
+      const response = await axios.get(url);
+      return response;
+    } catch (error) {
+      const message = `⚠️ <b>Erro:</b>\n Erro ao buscar bets inplay\nDetalhes:\n ${error.code}`;
+      this.repository.sendMessage({
+        chatId: this.config.telegramDefaultChatId,
+        message,
+      });
+      console.log(error);
+      throw error;
     }
-    const url = `${this.config.betApiUrl}/v1/bet365/inplay_filter?sport_id=1&token=${this.betApiKey}`;
-    const response = await axios.get(url);
-    return response;
   }
 
   async getMock() {
