@@ -43,35 +43,37 @@ export class BotDiffGolsEditMessageUseCase {
     };
     const messages = await this.message.cacheMessages({ ...filter, edited: false });
     for (const msg of messages) {
-      const messageId = JSON.parse(msg.messageId);
-      const chatId = JSON.parse(msg.chatId);
-      const bet = await this.betRepository.bets({ ...filter, betId: msg.betId.toString() });
-      if (!bet.length) continue;
-      console.log('time seconds', moment().diff(moment(bet[0].updatedAt), 'seconds'));
-      console.log('time status', moment().diff(moment(bet[0].updatedAt), 'seconds') > 10810);
-      if (moment().diff(moment(bet[0].updatedAt), 'seconds') > 10810) {
-        const result = JSON.parse(bet[0].bet);
-        const diff = calcDiff(result.ss, result.league.name).diff;
-        const home = formatTeam(result.home.name);
-        const away = formatTeam(result.away.name);
+      try {
+        const messageId = JSON.parse(msg.messageId);
+        const chatId = JSON.parse(msg.chatId);
+        const bet = await this.betRepository.bets({ ...filter, betId: msg.betId.toString() });
+        if (!bet.length) continue;
+        if (moment().diff(moment(bet[0].updatedAt), 'seconds') > 10810) {
+          const result = JSON.parse(bet[0].bet);
+          const diff = calcDiff(result.ss, result.league.name).diff;
+          const home = formatTeam(result.home.name);
+          const away = formatTeam(result.away.name);
 
-        let message = msg.message;
-        message =
-          message +
-          `
-        ------------------------------------
-        <b>** FIM DE JOGO **</b>
-        ${home} <b>${result.ss}</b> ${away}
-        <b>Gols de diferença</b>: ${diff}
-        `;
-        for (let i = 0; i < messageId.length; i++) {
-          await this.botDiffGolsRepository.editMessage({
-            chatId: chatId[i],
-            messageId: messageId[i],
-            message: message.replace(/^\s+/gm, ''),
-          });
+          let message = msg.message;
+          message =
+            message +
+            `
+          ------------------------------------
+          <b>** FIM DE JOGO **</b>
+          ${home} <b>${result.ss}</b> ${away}
+          <b>Gols de diferença</b>: ${diff}
+          `;
+          for (let i = 0; i < messageId.length; i++) {
+            await this.botDiffGolsRepository.editMessage({
+              chatId: chatId[i],
+              messageId: messageId[i],
+              message: message.replace(/^\s+/gm, ''),
+            });
+          }
+          await this.message.update(msg._id);
         }
-        await this.message.update(msg._id);
+      } catch (error) {
+        continue;
       }
     }
   }
