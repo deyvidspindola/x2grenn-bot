@@ -91,18 +91,19 @@ export class BotDiffGolsUseCase {
     return !send.includes(bet.id) && diff.result;
   }
 
-  private createMessage(bet: any) {
+  private async createMessage(bet: any) {
     const league = `<b>${bet.league.name}</b>`;
     const home = formatTeam(bet.home.name);
     const away = formatTeam(bet.away.name);
-    const title = `${home} <b>${bet.ss}</b> ${away}`;
-    const diff = calcDiff(bet.ss, bet.league.name).diff;
-    const message = `⚽️ ${league}\n${title}\n<b>Diferença de gols</b>: ${diff}\n${this.configuration.betUrl}${bet.ev_id}`;
+    const title = `${home} <b>${bet.ss.replace('-', ' x ')}</b> ${away}`;
+    const gol = await this.getLastGoal(bet.id);
+    const url = `${this.configuration.betUrl}${bet.ev_id}`;
+    const message = `${league}\n${title}\n${gol}\n${url}`;
     return message;
   }
 
   private async sendMessageToChats(chats: Chat[], bet: any) {
-    const message = this.createMessage(bet);
+    const message = await this.createMessage(bet);
     const sentMessages = await Promise.all(
       chats.map(async (chat) => {
         try {
@@ -142,6 +143,27 @@ export class BotDiffGolsUseCase {
         createdAt: _todayNow(),
         updatedAt: _todayNow(),
       });
+    }
+  }
+
+  private async getLastGoal(game_id: string): Promise<string | undefined> {
+    try {
+      const events = await this.requests.events(game_id);
+      if (!events.length) {
+        return undefined;
+      }
+      const [minute, goalInfo, team] = events.split('-').map((item: string) => item.trim());
+      const goalRegex = /(\d+)(?:st|nd|rd|th)?/;
+      const goalNumberMatch = goalInfo.match(goalRegex);
+      if (!goalNumberMatch) {
+        return undefined;
+      }
+      const goalNumber = goalNumberMatch[1];
+      const Team = formatTeam(team.replace(/^\((.*)\)$/, '$1'));
+      const formattedGoal = `⚽️  <b>${minute}</b> - ${goalNumber}º Gol - ${Team}`;
+      return formattedGoal;
+    } catch (error) {
+      return undefined;
     }
   }
 }

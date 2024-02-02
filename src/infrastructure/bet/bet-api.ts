@@ -39,4 +39,28 @@ export class BetApi {
       throw error;
     }
   }
+
+  public async getEvents(event_id: string): Promise<any> {
+    try {
+      const options = {
+        method: 'GET',
+        url: `${this.config.betApiUrl}/event`,
+        params: { FI: Number(event_id) },
+        headers: {
+          'X-RapidAPI-Key': this.betApiKey,
+          'X-RapidAPI-Host': 'betsapi2.p.rapidapi.com',
+        },
+      };
+      const response = await axios.request(options);
+      return response;
+    } catch (error) {
+      const message = `⚠️ <b>Erro:</b>\n Erro ao buscar eventos\nDetalhes:\n ${error.code}`;
+      this.repository.sendMessage({
+        chatId: this.config.telegramDefaultChatId,
+        message,
+      });
+      console.log(error);
+      throw error;
+    }
+  }
 }

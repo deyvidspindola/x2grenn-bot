@@ -3,3 +3,9 @@ export enum DiffGols {
   TEN_MIN = 4,
   TWELVE_MIN = 4,
 }
+
+export enum EventSTTypes {
+  GOLS = '2',
+  CORNER = '7',
+  SCORE_TIME = '1',
+}
