@@ -32,6 +32,7 @@ export const calcDiff = (ss: string, game: string) => {
   const result = ss.split('-');
   const diff = Math.abs(parseInt(result[0]) - parseInt(result[1]));
   return {
+    sum: parseInt(result[0]) + parseInt(result[1]),
     diff: diff,
     result: diff >= value,
   };
