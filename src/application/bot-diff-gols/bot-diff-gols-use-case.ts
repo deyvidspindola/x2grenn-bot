@@ -96,7 +96,8 @@ export class BotDiffGolsUseCase {
     const home = formatTeam(bet.home.name);
     const away = formatTeam(bet.away.name);
     const title = `${home} <b>${bet.ss.replace('-', ' x ')}</b> ${away}`;
-    const gol = await this.getLastGoal(bet.id);
+    const { diff } = calcDiff(bet.ss, bet.league.name);
+    const gol = await this.getLastGoal(bet.id, diff);
     const url = `${this.configuration.betUrl}${bet.ev_id}`;
     const message = `${league}\n${title}\n${gol}\n${url}`;
     return message;
@@ -146,7 +147,7 @@ export class BotDiffGolsUseCase {
     }
   }
 
-  private async getLastGoal(game_id: string): Promise<string | undefined> {
+  private async getLastGoal(game_id: string, diff: number): Promise<string | undefined> {
     try {
       const events = await this.requests.events(game_id);
       if (!events.length) {
@@ -158,7 +159,10 @@ export class BotDiffGolsUseCase {
       if (!goalNumberMatch) {
         return undefined;
       }
-      const goalNumber = goalNumberMatch[1];
+      let goalNumber = goalNumberMatch[1];
+      if (goalNumber < diff) {
+        goalNumber = diff;
+      }
       const Team = formatTeam(team.replace(/^\((.*)\)$/, '$1'));
       const formattedGoal = `⚽️  <b>${minute}</b> - ${goalNumber}º Gol - ${Team}`;
       return formattedGoal;

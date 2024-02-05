@@ -60,7 +60,7 @@ export class BotDiffGolsEditMessageUseCase {
             `
           ------------------------------------
           <b>** FIM DE JOGO **</b>
-          ${home} <b>${result.ss}</b> ${away}
+          ${home} <b>${result.ss.replace('-', ' x ')}</b> ${away}
           <b>Gols de diferença</b>: ${diff}
           `;
           for (let i = 0; i < messageId.length; i++) {
