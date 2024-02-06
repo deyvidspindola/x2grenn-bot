@@ -14,6 +14,18 @@ export const formatTeam = (team: string) => {
   return newTeam;
 };
 
+export const _formatLeague = (league: string) => {
+  let formattedName = league.split(' - ')[1];
+  if (formattedName.includes('8')) {
+    formattedName = `🟢 <b>${formattedName}</b>`;
+  } else if (formattedName.includes('10')) {
+    formattedName = `🔵 <b>${formattedName}</b>`;
+  } else if (formattedName.includes('12')) {
+    formattedName = `🔴 <b>${formattedName}</b>`;
+  }
+  return formattedName;
+};
+
 export const _diff = (gameTime: number) => {
   switch (gameTime) {
     case 8:

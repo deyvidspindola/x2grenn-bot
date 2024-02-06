@@ -141,9 +141,9 @@ export class BotDiffGolsReportUseCase {
     .
     <b>JOGOS</b>
     ----------------------------------
-    8 minutos menor ou igual a 3 gols: <b>${process.gamesLessThan3Goals8Mins}</b>
-    10 minutos menor ou igual a 4 gols: <b>${process.gamesLessThan4Goals10Mins}</b>
-    12 minutos menor ou igual a 3 gols: <b>${process.gamesLessThan4Goals12Mins}</b>
+    8 minutos menor ou igual a ${DiffGols.EIGHT_MIN} gols: <b>${process.gamesLessThan3Goals8Mins}</b>
+    10 minutos menor ou igual a ${DiffGols.TEN_MIN} gols: <b>${process.gamesLessThan4Goals10Mins}</b>
+    12 minutos menor ou igual a ${DiffGols.TWELVE_MIN} gols: <b>${process.gamesLessThan4Goals12Mins}</b>
     Total: <b>${
       process.gamesLessThan3Goals8Mins + process.gamesLessThan4Goals10Mins + process.gamesLessThan4Goals12Mins
     }</b>

@@ -8,7 +8,7 @@ import { MessageRepository } from '../../domain/message-repository';
 import { Messages } from '../../domain/entities/message';
 import { BotDiffGolsRepository } from '../../domain/bots/repository/bot-diff-gols-repository';
 import { BetRepository } from '../../domain/bet-repository';
-import { _endDate, _startDate, _today, _todayNow, calcDiff, formatTeam } from '../utils';
+import { _endDate, _formatLeague, _startDate, _today, _todayNow, calcDiff, formatTeam } from '../utils';
 
 let send = [];
 export class BotDiffGolsUseCase {
@@ -92,14 +92,15 @@ export class BotDiffGolsUseCase {
   }
 
   private async createMessage(bet: any) {
-    const league = `<b>${bet.league.name}</b>`;
+    const league = _formatLeague(bet.league.name);
     const home = formatTeam(bet.home.name);
     const away = formatTeam(bet.away.name);
     const title = `${home} <b>${bet.ss.replace('-', ' x ')}</b> ${away}`;
-    const { sum } = calcDiff(bet.ss, bet.league.name);
+    const { sum, diff } = calcDiff(bet.ss, bet.league.name);
     const gol = await this.getLastGoal(bet.id, sum);
     const url = `${this.configuration.betUrl}${bet.ev_id}`;
-    const message = `${league}\n${title}\n${gol}\n${url}`;
+    const diffGols = `<b>Gols de diferença: ${diff}</b>`;
+    const message = `${league}\n${title}\n.\n${gol}\n.\n${diffGols}\n.\n${url}`;
     return message;
   }
 
