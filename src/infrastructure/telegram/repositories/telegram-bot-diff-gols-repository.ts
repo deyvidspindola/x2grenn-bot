@@ -63,7 +63,7 @@ export class TelegramBotDiffGolsRepository implements BotDiffGolsRepository {
   }
 
   async subscribe() {
-    this.client.command('start', async (ctx) => {
+    this.client.command('0022554433', async (ctx) => {
       const chatId = ctx.chat?.id;
       const firstName = ctx.from?.first_name;
       const lastName = ctx.from?.last_name;
