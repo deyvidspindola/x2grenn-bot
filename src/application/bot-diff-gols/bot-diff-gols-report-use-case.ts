@@ -80,6 +80,10 @@ export class BotDiffGolsReportUseCase {
     let gamesLessThan4Goals10Mins = 0;
     let gamesLessThan4Goals12Mins = 0;
 
+    let gamesLessThan2Goals8Mins = 0;
+    let gamesLessThan3Goals10Mins = 0;
+    let gamesLessThan3Goals12Mins = 0;
+
     for (const msg of messages) {
       const bet = betResults.find((b: any) => b.betId === msg.betId);
       if (!bet) continue;
@@ -94,6 +98,14 @@ export class BotDiffGolsReportUseCase {
       } else if (betResult.league.name.includes('12 mins') && diff <= DiffGols.TWELVE_MIN) {
         gamesLessThan4Goals12Mins++;
       }
+
+      if (betResult.league.name.includes('8 mins') && diff <= DiffGols.EIGHT_MIN - 1) {
+        gamesLessThan2Goals8Mins++;
+      } else if (betResult.league.name.includes('10 mins') && diff <= DiffGols.TEN_MIN - 1) {
+        gamesLessThan3Goals10Mins++;
+      } else if (betResult.league.name.includes('12 mins') && diff <= DiffGols.TWELVE_MIN - 1) {
+        gamesLessThan3Goals12Mins++;
+      }
     }
 
     return {
@@ -102,6 +114,9 @@ export class BotDiffGolsReportUseCase {
       gamesLessThan3Goals8Mins,
       gamesLessThan4Goals10Mins,
       gamesLessThan4Goals12Mins,
+      gamesLessThan2Goals8Mins,
+      gamesLessThan3Goals10Mins,
+      gamesLessThan3Goals12Mins,
     };
   }
 
@@ -146,6 +161,13 @@ export class BotDiffGolsReportUseCase {
     12 minutos menor ou igual a ${DiffGols.TWELVE_MIN} gols: <b>${process.gamesLessThan4Goals12Mins}</b>
     Total: <b>${
       process.gamesLessThan3Goals8Mins + process.gamesLessThan4Goals10Mins + process.gamesLessThan4Goals12Mins
+    }</b>
+    ----------------------------------
+    8 minutos menor ou igual a ${DiffGols.EIGHT_MIN - 1} gols: <b>${process.gamesLessThan2Goals8Mins}</b>
+    10 minutos menor ou igual a ${DiffGols.TEN_MIN - 1} gols: <b>${process.gamesLessThan3Goals10Mins}</b>
+    12 minutos menor ou igual a ${DiffGols.TWELVE_MIN - 1} gols: <b>${process.gamesLessThan3Goals12Mins}</b>
+    Total: <b>${
+      process.gamesLessThan2Goals8Mins + process.gamesLessThan3Goals10Mins + process.gamesLessThan3Goals12Mins
     }</b>
     `;
     return message.replace(/^\s+/gm, '');
